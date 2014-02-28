@@ -47,7 +47,7 @@ For these cases we have developed a set of extensions for seamless integration o
 
 ##Simple build
 
-Run build.sh
+Run _build.sh_
 
 ##Build and Test
 
