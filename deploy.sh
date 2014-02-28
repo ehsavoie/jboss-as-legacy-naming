@@ -1,12 +1,7 @@
 #!/bin/sh
 
-mvn clean install -Dcheckstyle.skip=true
+mvn clean install  -s config/settings.xml -Plegacy -Dcheckstyle.skip=true
 
-if [ "x$EAP5_HOME" = "x" ]; then
-    # get the full path (without any relative bits)
-    echo "Set ENV EAP5_HOME!"
-    return 1
-fi
 
 if [ "x$JBOSS_HOME" = "x" ]; then
     # get the full path (without any relative bits)

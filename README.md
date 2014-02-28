@@ -19,11 +19,13 @@ For these cases we have developed a set of extensions for seamless integration o
       <extension module="org.jboss.legacy.jnp"/>  
     </extensions>  
     ...  
-    <subsystem xmlns="urn:jboss:doma:in:legacy-jnp:1.0">  
+    <subsystem xmlns="urn:jboss:domain:legacy-jnp:1.0">  
       <jnp-server/>  
       <jnp-connector socket-binding="jnp" rmi-socket-binding="rmi-jnp" />  
       <distributed-cache cache-container="singleton" cache-ref="default" />  
-    </subsystem>  
+    </subsystem>
+    ...
+    <!-- Default Infinispan configuration to show how it matches the distributed cache -->  
     <subsystem xmlns="urn:jboss:domain:infinispan:1.4">  
       <cache-container name="singleton" aliases="cluster ha-partition" default-cache="default">  
         <transport lock-timeout="60000"/>  
@@ -43,18 +45,29 @@ For these cases we have developed a set of extensions for seamless integration o
     
 #Build
 
-Download and install EAP 5.2.0 (at least) and EAP 6.2.1.
+##Simple build
 
-Define the environment variable $EAP5_HOME pointing towards your EAP5 installation.
+Run build.sh
+
+##Build and Test
+
+Download a zip archive of EAP 6.2.1 (at least).
+
+Run _build.sh -Djbossas.eap6.zip=/path to archive/jboss-eap-6.2.1-full-build.zip_
+
+#Build and deploy
+
+Download and install EAP 6.2.1 (at least).
 
 Define the environment variable $JBOSS_HOME pointing towards your EAP6 installation.
 
-Run deploy.sh
+Run _deploy.sh_
 
 Define your configuration in the EAP6 server.
 
 #Installation
-Download the zip or tar.gz archive
+
+Download the zip or tar.gz archive of the extension.
 
 Unarchive it in the EAP6 installation directory.
 
