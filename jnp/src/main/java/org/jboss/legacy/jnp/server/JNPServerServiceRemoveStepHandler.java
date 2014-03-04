@@ -22,13 +22,13 @@
 
 package org.jboss.legacy.jnp.server;
 
-import org.jboss.legacy.jnp.server.clustered.HAServerService;
 import org.jboss.as.controller.AbstractRemoveStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.dmr.ModelNode;
+import org.jboss.legacy.jnp.server.clustered.HAServerService;
 
 /**
  * @author baranowb

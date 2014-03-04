@@ -21,14 +21,15 @@
  */
 package org.jboss.legacy.jnp.connector.clustered;
 
+import org.jboss.legacy.jnp.server.NamingStoreAdapter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.jboss.as.clustering.impl.CoreGroupCommunicationService;
 import org.jboss.as.naming.ServiceBasedNamingStore;
 import org.jboss.as.network.SocketBinding;
-import org.jboss.ha.jndi.HANamingService;
 import org.jboss.legacy.jnp.connector.JNPServerNamingConnectorService;
 import org.jboss.legacy.jnp.infinispan.InfinispanDistributedTreeManager;
 import org.jboss.legacy.jnp.infinispan.InfinispanHAPartition;
-import org.jboss.legacy.jnp.server.NamingStoreWrapper;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
@@ -38,7 +39,7 @@ import org.jboss.msc.value.InjectedValue;
  * @author baranowb
  * @author <a href="mailto:ehugonne@redhat.com">Emmanuel Hugonnet</a> (c) 2013 Red Hat, inc.
  */
-public class HAConnectorService implements JNPServerNamingConnectorService<HANamingService> {
+public class HAConnectorService implements JNPServerNamingConnectorService<HAConnectorLegacyService> {
 
     private final InjectedValue<InfinispanDistributedTreeManager> distributedTreeManager = new InjectedValue<InfinispanDistributedTreeManager>();
     private final InjectedValue<CoreGroupCommunicationService> coreGroupCommunicationService = new InjectedValue<CoreGroupCommunicationService>();
@@ -46,8 +47,7 @@ public class HAConnectorService implements JNPServerNamingConnectorService<HANam
     private final InjectedValue<SocketBinding> rmiBinding = new InjectedValue<SocketBinding>();
     private final InjectedValue<ServiceBasedNamingStore> namingStoreValue = new InjectedValue<ServiceBasedNamingStore>();
 
-    private NamingStoreWrapper singletonNamingServer;
-    private HANamingService haNamingService;
+    private HAConnectorLegacyService service;
 
     public HAConnectorService() {
         super();
@@ -76,29 +76,23 @@ public class HAConnectorService implements JNPServerNamingConnectorService<HANam
     }
 
     @Override
-    public HANamingService getValue() throws IllegalStateException, IllegalArgumentException {
-        return this.haNamingService;
+    public HAConnectorLegacyService getValue() throws IllegalStateException, IllegalArgumentException {
+        return this.service;
     }
 
     @Override
     public void start(StartContext startContext) throws StartException {
         try {
-            this.haNamingService = new HANamingService();
-            this.singletonNamingServer = new NamingStoreWrapper(namingStoreValue.getValue());
-            InfinispanHAPartition partition = new InfinispanHAPartition(coreGroupCommunicationService.getValue());
-            this.haNamingService.setHAPartition(partition);
-            this.haNamingService.setDistributedTreeManager(distributedTreeManager.getValue());
-            this.haNamingService.setLocalNamingInstance(singletonNamingServer);
-
             if (this.getRmiBinding().getOptionalValue() != null) {
-                haNamingService.setRmiBindAddress(this.getRmiBinding().getValue().getAddress().getHostName());
-                haNamingService.setRmiPort(this.getRmiBinding().getValue().getAbsolutePort());
+                service = new HAConnectorLegacyService(new NamingStoreAdapter(namingStoreValue.getValue()), distributedTreeManager.getValue(),
+                        new InfinispanHAPartition(new InfinispanGroupCommunicationService(coreGroupCommunicationService.getValue())), this.getBinding().getValue().getAddress().getHostName(),
+                        this.getBinding().getValue().getAbsolutePort(), this.getRmiBinding().getValue().getAddress().getHostName(), this.getRmiBinding().getValue().getAbsolutePort());
+            } else {
+                service = new HAConnectorLegacyService(new NamingStoreAdapter(namingStoreValue.getValue()), distributedTreeManager.getValue(),
+                        new InfinispanHAPartition(new InfinispanGroupCommunicationService(coreGroupCommunicationService.getValue())), this.getBinding().getValue().getAddress().getHostName(),
+                        this.getBinding().getValue().getAbsolutePort());
             }
-            haNamingService.setBindAddress(this.getBinding().getValue().getAddress().getHostName());
-            haNamingService.setPort(this.getBinding().getValue().getAbsolutePort());
-            partition.start();
-            haNamingService.create();
-            haNamingService.start();
+            service.start();
         } catch (Exception e) {
             throw new StartException(e);
         }
@@ -106,7 +100,10 @@ public class HAConnectorService implements JNPServerNamingConnectorService<HANam
 
     @Override
     public void stop(StopContext stopContext) {
-        this.haNamingService.stop();
-        this.haNamingService = null;
+        try {
+            this.service.stop();
+        } catch (Exception ex) {
+            Logger.getLogger(HAConnectorService.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

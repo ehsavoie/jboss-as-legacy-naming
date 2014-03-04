@@ -1,0 +1,24 @@
+<module xmlns="urn:jboss:module:1.0" name="org.jboss.legacy.naming.eap5">
+    <resources>
+        <resource-root path="lib/concurrent.jar"/>
+        <resource-root path="lib/jboss-as-cluster.jar"/>
+        <resource-root path="lib/jboss-as-j2se.jar"/>
+        <resource-root path="lib/jboss-as-server.jar"/>
+        <resource-root path="lib/jboss-as-system-jmx.jar"/>
+        <resource-root path="lib/jboss-as-system.jar"/>
+        <resource-root path="lib/jboss-common-core.jar"/>
+        <resource-root path="lib/jboss-dependency.jar"/>
+        <resource-root path="lib/jboss-ha-client.jar"/>
+        <resource-root path="lib/jboss-ha-server-api.jar"/>
+        <resource-root path="lib/jboss-ha-server-cache-spi.jar"/>
+        <resource-root path="lib/jboss-kernel.jar"/>
+        <resource-root path="lib/jboss-remoting.jar"/>
+        <resource-root path="lib/jboss-security-spi.jar"/>
+        <resource-root path="lib/jnpserver.jar"/>
+    </resources>
+
+    <dependencies>
+        <module name="org.jboss.logging"/>
+        <module name="javax.api" export="true"/>
+    </dependencies>
+</module>

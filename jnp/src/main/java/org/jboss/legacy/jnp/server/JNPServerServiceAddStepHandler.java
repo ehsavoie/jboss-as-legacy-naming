@@ -21,7 +21,6 @@
  */
 package org.jboss.legacy.jnp.server;
 
-import org.jboss.legacy.jnp.server.clustered.HAServerService;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -33,8 +32,9 @@ import org.jboss.as.controller.ServiceVerificationHandler;
 import org.jboss.as.naming.ServiceBasedNamingStore;
 import org.jboss.as.naming.deployment.ContextNames;
 import org.jboss.dmr.ModelNode;
-import org.jboss.ha.jndi.HANamingService;
-import org.jboss.legacy.jnp.connector.JNPServerNamingConnectorService;
+import org.jboss.legacy.jnp.connector.clustered.HAConnectorLegacyService;
+import org.jboss.legacy.jnp.connector.clustered.HAConnectorService;
+import org.jboss.legacy.jnp.server.clustered.HAServerService;
 import org.jboss.legacy.jnp.server.simple.SingleServerService;
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController;
@@ -65,7 +65,7 @@ public class JNPServerServiceAddStepHandler extends AbstractBoottimeAddStepHandl
         if (isHA) {
             HAServerService service = new HAServerService();
             serviceBuilder = serviceTarget.addService(JNPServerService.SERVICE_NAME, service);
-            serviceBuilder.addDependency(JNPServerNamingConnectorService.SERVICE_NAME, HANamingService.class, ((HAServerService) service).getHaNamingService());
+            serviceBuilder.addDependency(HAConnectorService.SERVICE_NAME, HAConnectorLegacyService.class, ((HAServerService) service).getHAConnectorLegacyService());
         } else {
             SingleServerService service = new SingleServerService();
             serviceBuilder = serviceTarget.addService(JNPServerService.SERVICE_NAME, service);

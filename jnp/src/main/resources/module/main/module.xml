@@ -1,27 +1,10 @@
 <module xmlns="urn:jboss:module:1.0" name="org.jboss.legacy.jnp">
     <resources>
         <resource-root path="jboss-as-legacy-naming-jnp.jar"/>
-
-        <resource-root path="lib/concurrent.jar"/>
-        <resource-root path="lib/infinispan-tree.jar"/>
-        <resource-root path="lib/jboss-as-cluster.jar"/>
-        <resource-root path="lib/jboss-as-j2se.jar"/>
-        <resource-root path="lib/jboss-as-server.jar"/>
-        <resource-root path="lib/jboss-as-system-jmx.jar"/>
-        <resource-root path="lib/jboss-as-system.jar"/>
-        <resource-root path="lib/jboss-common-core.jar"/>
-        <resource-root path="lib/jboss-dependency.jar"/>
-        <resource-root path="lib/jboss-ha-client.jar"/>
-        <resource-root path="lib/jboss-ha-server-api.jar"/>
-        <resource-root path="lib/jboss-ha-server-cache-spi.jar"/>
-        <resource-root path="lib/jboss-kernel.jar"/>
-        <resource-root path="lib/jboss-remoting.jar"/>
-        <resource-root path="lib/jboss-security-spi.jar"/>
-        <resource-root path="lib/jnpserver.jar"/>
-
     </resources>
 
     <dependencies>
+        <module name="org.jboss.legacy.naming.spi" export="true"/>
         <module name="javax.jms.api" export="true"/>
         <module name="javax.transaction.api" export="true"/>
         <module name="javax.security.jacc.api" export="true"/>
@@ -41,11 +24,6 @@
         <module name="org.jboss.marshalling.river" />
         <module name="org.jboss.marshalling" />
         <module name="org.apache.commons.logging" />
-        <module name="org.infinispan"/>
-        <module name="org.jboss.as.clustering.api"/>
-        <module name="org.jboss.as.clustering.impl" />
-        <module name="org.jboss.as.clustering.infinispan"/>
-        <module name="org.jboss.as.clustering.service" />
         <module name="javax.api" export="true"/>
     </dependencies>
 </module>

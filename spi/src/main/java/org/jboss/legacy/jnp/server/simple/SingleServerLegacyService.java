@@ -41,61 +41,55 @@
  */
 package org.jboss.legacy.jnp.server.simple;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.jboss.as.naming.ServiceBasedNamingStore;
+import javax.naming.NamingException;
 import org.jboss.legacy.jnp.server.JNPServer;
-import org.jboss.legacy.jnp.server.JNPServerService;
 import org.jboss.legacy.jnp.server.LegacyJNPServerService;
-import org.jboss.legacy.jnp.server.NamingStoreAdapter;
-import org.jboss.msc.inject.Injector;
-import org.jboss.msc.service.StartContext;
-import org.jboss.msc.service.StartException;
-import org.jboss.msc.service.StopContext;
-import org.jboss.msc.value.InjectedValue;
+import org.jboss.legacy.jnp.server.NamingStore;
+import org.jboss.legacy.jnp.server.NamingStoreWrapper;
+import org.jnp.interfaces.Naming;
+import org.jnp.interfaces.NamingContext;
+import org.jnp.server.NamingBean;
 
 /**
- * @author baranowb
+ * 
+ * @author <a href="mailto:ehugonne@redhat.com">Emmanuel Hugonnet</a>  (c) 2013 Red Hat, inc.
  */
-public class SingleServerService implements JNPServerService {
+public class SingleServerLegacyService extends LegacyJNPServerService {
 
-    private final InjectedValue<ServiceBasedNamingStore> namingStoreValue = new InjectedValue<ServiceBasedNamingStore>();
-    private LegacyJNPServerService service;
+    private NamingStoreWrapper namingStoreWrapper;
 
-    public SingleServerService() {
-        super();
+    public SingleServerLegacyService(NamingStore namingStore) throws NamingException {
+        this.namingStoreWrapper = new NamingStoreWrapper(namingStore);
     }
 
     @Override
-    public JNPServer getValue() throws IllegalStateException, IllegalArgumentException {
-        return service.getJNPServer();
-    }
-
-    /**
-     * Get the naming store injector.
-     *
-     * @return the injector
-     */
-    public Injector<ServiceBasedNamingStore> getNamingStoreInjector() {
-        return namingStoreValue;
+    public JNPServer getJNPServer() {
+        return new SingleJNPServer();
     }
 
     @Override
-    public void start(StartContext startContext) throws StartException {
-        try {
-            this.service = new SingleServerLegacyService(new NamingStoreAdapter(namingStoreValue.getValue()));
-            this.service.start();
-        } catch (Exception e) {
-            throw new StartException(e);
+    public void internalStart() throws Exception {
+        NamingContext.setLocal(this.namingStoreWrapper);
+    }
+
+    @Override
+    public void internalStop() {
+        NamingContext.setLocal(null);
+        this.namingStoreWrapper = null;
+    }
+
+    class SingleJNPServer implements JNPServer {
+
+        @Override
+        public NamingBean getNamingBean() {
+            return new NamingBean() {
+
+                @Override
+                public Naming getNamingInstance() {
+                    return namingStoreWrapper;
+                }
+            };
         }
     }
 
-    @Override
-    public void stop(StopContext stopContext) {
-        try {
-            this.service.stop();
-        } catch (Exception ex) {
-            Logger.getLogger(SingleServerService.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
 }

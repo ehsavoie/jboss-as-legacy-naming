@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
-import org.jboss.as.clustering.impl.CoreGroupCommunicationService;
 import org.jboss.ha.framework.interfaces.ClusterNode;
 import org.jboss.ha.framework.interfaces.DistributedReplicantManager;
 import org.jboss.ha.framework.interfaces.DistributedState;
@@ -39,11 +38,11 @@ import org.jboss.ha.framework.server.DistributedReplicantManagerImpl;
  */
 public class InfinispanHAPartition implements HAPartition {
 
-    private final CoreGroupCommunicationService service;
+    private final HAGroupCommunicationService service;
     private final Map<HAMembershipListener, HAMembershipListenerAdapter> groupMembershipListeners = new HashMap<HAMembershipListener, HAMembershipListenerAdapter>();
     private final DistributedReplicantManagerImpl distributedReplicantManager;
 
-    public InfinispanHAPartition(CoreGroupCommunicationService service) {
+    public InfinispanHAPartition(HAGroupCommunicationService service) {
         this.service = service;
         this.distributedReplicantManager = new DistributedReplicantManagerImpl(this);
     }

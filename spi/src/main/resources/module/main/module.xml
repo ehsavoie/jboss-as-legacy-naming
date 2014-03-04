@@ -1,0 +1,15 @@
+<module xmlns="urn:jboss:module:1.0" name="org.jboss.legacy.naming.spi">
+    <resources>
+        <resource-root path="jboss-as-legacy-naming-spi.jar"/>
+        <resource-root path="lib/infinispan-tree.jar"/>
+    </resources>
+
+    <dependencies>
+        <module name="org.jboss.legacy.naming.eap5" export="true"/>
+        <module name="org.infinispan"/>
+        <module name="org.jboss.as.clustering.api"/>
+        <module name="org.jboss.as.clustering.impl" />
+        <module name="org.jboss.as.clustering.infinispan"/>
+        <module name="org.jboss.as.clustering.service" />
+    </dependencies>
+</module>

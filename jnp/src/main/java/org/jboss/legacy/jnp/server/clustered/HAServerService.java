@@ -21,24 +21,25 @@
  */
 package org.jboss.legacy.jnp.server.clustered;
 
-import org.jboss.ha.jndi.HANamingService;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.jboss.legacy.jnp.connector.clustered.HAConnectorLegacyService;
 import org.jboss.legacy.jnp.server.JNPServer;
 import org.jboss.legacy.jnp.server.JNPServerService;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
-import org.jnp.interfaces.Naming;
-import org.jnp.server.NamingBean;
 
 /**
- * @author baranowb
+ * 
+ * @author <a href="mailto:ehugonne@redhat.com">Emmanuel Hugonnet</a>  (c) 2013 Red Hat, inc.
  */
 public class HAServerService implements JNPServerService {
 
-    private final InjectedValue<HANamingService> haNamingService = new InjectedValue<HANamingService>();
+    private final InjectedValue<HAConnectorLegacyService> haNamingService = new InjectedValue<HAConnectorLegacyService>();
 
-    private JNPServer server;
+    private HAServerLegacyService service;
 
     public HAServerService() {
         super();
@@ -46,31 +47,29 @@ public class HAServerService implements JNPServerService {
 
     @Override
     public JNPServer getValue() throws IllegalStateException, IllegalArgumentException {
-        return this.server;
+        return service.getJNPServer();
     }
 
-    public InjectedValue<HANamingService> getHaNamingService() {
+    public InjectedValue<HAConnectorLegacyService> getHAConnectorLegacyService() {
         return haNamingService;
     }
 
     @Override
     public void start(StartContext startContext) throws StartException {
-        this.server = new JNPServer() {
-            @Override
-            public NamingBean getNamingBean() {
-                return new NamingBean() {
-
-                    @Override
-                    public Naming getNamingInstance() {
-                        return haNamingService.getValue().getLocalNamingInstance();
-                    }
-                };
-            }
-        };
+        try {
+            service = new HAServerLegacyService(getHAConnectorLegacyService().getValue());
+            service.start();
+        } catch (Exception ex) {
+            throw new StartException(ex);
+        }
     }
 
     @Override
     public void stop(StopContext context) {
-        this.server = null;
+        try {
+            service.stop();
+        } catch (Exception ex) {
+            Logger.getLogger(HAServerService.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

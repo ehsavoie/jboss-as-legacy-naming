@@ -30,7 +30,23 @@ MA 02110-1301  USA
     <includeBaseDirectory>false</includeBaseDirectory>
     <fileSets>
         <fileSet>
-            <directory>target/module</directory>
+            <directory>jnp/target/module</directory>
+            <outputDirectory>modules/system/layers/base</outputDirectory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <useDefaultExcludes>true</useDefaultExcludes>
+        </fileSet>
+        <fileSet>
+            <directory>eap5/target/module</directory>
+            <outputDirectory>modules/system/layers/base</outputDirectory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <useDefaultExcludes>true</useDefaultExcludes>
+        </fileSet>
+        <fileSet>
+            <directory>spi/target/module</directory>
             <outputDirectory>modules/system/layers/base</outputDirectory>
             <includes>
                 <include>**/*.*</include>
@@ -40,7 +56,7 @@ MA 02110-1301  USA
     </fileSets>
     <files>
         <file>
-            <source>../README.md</source>
+            <source>README.md</source>
             <outputDirectory></outputDirectory>
         </file>
     </files>

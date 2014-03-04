@@ -27,8 +27,6 @@ import javax.naming.Context;
 import javax.naming.Name;
 import javax.naming.NameClassPair;
 import javax.naming.NamingException;
-import org.jboss.as.naming.NamingStore;
-import org.jboss.as.naming.ServiceBasedNamingStore;
 import org.jnp.interfaces.Naming;
 import org.jnp.interfaces.NamingContext;
 import org.jnp.server.SingletonNamingServer;
@@ -43,7 +41,7 @@ public class NamingStoreWrapper implements Naming {
     private final SingletonNamingServer singletonNamingServer;
     private final NamingStore namingStore;
 
-    public NamingStoreWrapper(ServiceBasedNamingStore namingStore) throws NamingException {
+    public NamingStoreWrapper(NamingStore namingStore) throws NamingException {
         this.namingStore = namingStore;
         this.singletonNamingServer = new SingletonNamingServer();
         NamingContext.setLocal(this);

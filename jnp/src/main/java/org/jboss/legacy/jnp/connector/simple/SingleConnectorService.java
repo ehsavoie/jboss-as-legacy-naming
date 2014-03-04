@@ -21,6 +21,8 @@
  */
 package org.jboss.legacy.jnp.connector.simple;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.jboss.as.network.SocketBinding;
 import org.jboss.legacy.jnp.connector.JNPServerNamingConnectorService;
 import org.jboss.legacy.jnp.server.JNPServer;
@@ -28,23 +30,19 @@ import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
-import org.jnp.server.Main;
 
 /**
  * @author baranowb
  */
-public class SingleConnectorService implements JNPServerNamingConnectorService<Main> {
-
+public class SingleConnectorService implements JNPServerNamingConnectorService<SingleConnectorLegacyService> {
 
     private final InjectedValue<SocketBinding> binding = new InjectedValue<SocketBinding>();
     private final InjectedValue<SocketBinding> rmiBinding = new InjectedValue<SocketBinding>();
     private final InjectedValue<JNPServer> jnpServer = new InjectedValue<JNPServer>();
-    private Main serverConnector;
-
+    private SingleConnectorLegacyService serverConnector;
 
     public SingleConnectorService() {
     }
-
 
     public InjectedValue<JNPServer> getJNPServer() {
         return jnpServer;
@@ -61,21 +59,19 @@ public class SingleConnectorService implements JNPServerNamingConnectorService<M
     }
 
     @Override
-    public Main getValue() throws IllegalStateException, IllegalArgumentException {
+    public SingleConnectorLegacyService getValue() throws IllegalStateException, IllegalArgumentException {
         return this.serverConnector;
     }
 
     @Override
     public void start(StartContext startContext) throws StartException {
-        this.serverConnector = new Main();
-        this.serverConnector.setNamingInfo(jnpServer.getValue().getNamingBean());
         try {
             if (this.getRmiBinding().getOptionalValue() != null) {
-                this.serverConnector.setRmiBindAddress(this.getRmiBinding().getValue().getAddress().getHostName());
-                this.serverConnector.setRmiPort(this.getRmiBinding().getValue().getAbsolutePort());
+                this.serverConnector = new SingleConnectorLegacyService(jnpServer.getValue(), this.getBinding().getValue().getAddress().getHostName(), this.getBinding().getValue().getAbsolutePort(),
+                        this.getRmiBinding().getValue().getAddress().getHostName(), this.getRmiBinding().getValue().getAbsolutePort());
+            } else {
+                this.serverConnector = new SingleConnectorLegacyService(jnpServer.getValue(), this.getBinding().getValue().getAddress().getHostName(), this.getBinding().getValue().getAbsolutePort());
             }
-            this.serverConnector.setBindAddress(this.getBinding().getValue().getAddress().getHostName());
-            this.serverConnector.setPort(this.getBinding().getValue().getAbsolutePort());
             this.serverConnector.start();
         } catch (Exception e) {
             throw new StartException(e);
@@ -84,7 +80,11 @@ public class SingleConnectorService implements JNPServerNamingConnectorService<M
 
     @Override
     public void stop(StopContext stopContext) {
-        this.serverConnector.stop();
+        try {
+            this.serverConnector.stop();
+        } catch (Exception ex) {
+            Logger.getLogger(SingleConnectorService.class.getName()).log(Level.SEVERE, null, ex);
+        }
         this.serverConnector = null;
     }
 }

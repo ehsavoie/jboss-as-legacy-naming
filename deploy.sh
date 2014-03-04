@@ -9,6 +9,8 @@ if [ "x$JBOSS_HOME" = "x" ]; then
     return 1
 fi
 
+cp -Rf eap5/target/module/org $JBOSS_HOME/modules/system/layers/base/
+cp -Rf spi/target/module/org $JBOSS_HOME/modules/system/layers/base/
 cp -Rf jnp/target/module/org $JBOSS_HOME/modules/system/layers/base/
 
 echo "Edit configuration file - for instance $JBOSS_HOME/standalone/configuration/standalone.xml"
