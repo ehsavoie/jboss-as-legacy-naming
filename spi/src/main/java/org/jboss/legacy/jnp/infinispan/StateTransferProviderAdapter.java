@@ -22,14 +22,13 @@
 package org.jboss.legacy.jnp.infinispan;
 
 import java.io.Serializable;
-import org.jboss.as.clustering.StateTransferProvider;
 import org.jboss.ha.framework.interfaces.HAPartition;
 
 /**
  *
  * @author <a href="mailto:ehugonne@redhat.com">Emmanuel Hugonnet</a> (c) 2013 Red Hat, inc.
  */
-public class StateTransferProviderAdapter implements StateTransferProvider {
+public class StateTransferProviderAdapter implements ClusterStateTransferProvider {
 
     private final HAPartition.HAPartitionStateTransfer transfert;
 

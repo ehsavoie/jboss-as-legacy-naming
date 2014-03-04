@@ -21,6 +21,7 @@
  */
 package org.jboss.legacy.jnp.infinispan;
 
+import java.rmi.Naming;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.naming.Binding;
-import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.InvalidNameException;
 import javax.naming.Name;
@@ -44,24 +44,18 @@ import org.infinispan.tree.Fqn;
 import org.infinispan.tree.TreeCache;
 import org.infinispan.tree.Node;
 import org.infinispan.tree.TreeCacheFactory;
-import org.jboss.ha.jndi.spi.DistributedTreeManager;
+import org.jboss.as.naming.NamingContext;
 import org.jboss.logging.Logger;
-import org.jnp.interfaces.Naming;
-import org.jnp.interfaces.NamingContext;
-import org.jnp.interfaces.NamingParser;
 
 /**
  *
  * @author <a href="mailto:ehugonne@redhat.com">Emmanuel Hugonnet</a> (c) 2013 Red Hat, inc.
  */
-public class InfinispanDistributedTreeManager implements org.jnp.interfaces.Naming, DistributedTreeManager {
+public class InfinispanDistributedTreeManager implements InfinispanDistributedCacheTree {
 
     static final long serialVersionUID = 6342802270002172451L;
 
     private static Logger log = Logger.getLogger(InfinispanDistributedTreeManager.class);
-
-    private static final NamingParser parser = new NamingParser();
-
     public static final String DEFAULT_ROOT = "__HA_JNDI__";
 
     private TreeCache<String, Binding> cache;
@@ -110,17 +104,7 @@ public class InfinispanDistributedTreeManager implements org.jnp.interfaces.Nami
 
     @Override
     public void shutdown() {
-        cache.stop();
-    }
-
-    @Override
-    public Naming getHAStub() {
-        return this.haStub;
-    }
-
-    @Override
-    public void setHAStub(Naming stub) {
-        this.haStub = stub;
+        this.cache = null;
     }
 
     @Override
@@ -196,29 +180,11 @@ public class InfinispanDistributedTreeManager implements org.jnp.interfaces.Nami
         }
     }
 
+    @Override
     public Object lookup(Name name) throws NamingException {
         boolean trace = log.isTraceEnabled();
         if (trace) {
             log.trace("lookup, name=" + name);
-        }
-
-        if (name.isEmpty()) {
-            // Return this
-            return new NamingContext(null, parser.parse(""), this.getHAStub());
-        }
-
-        // is the name a context?
-        try {
-            Node<String, Binding> n = this.cache.getRoot().getChild(Fqn.fromRelativeFqn(this.m_root, Fqn.fromString(name.toString())));
-            if (n != null) {
-                Name fullName = (Name) name.clone();
-                return new NamingContext(null, fullName, this.getHAStub());
-            }
-        } catch (CacheException ce) {
-            // don't chain CacheException since JBoss Cache may not be on remote client's classpath
-            NamingException ne = new NamingException(ce.getClass().getName() + ": " + ce.getMessage());
-            ne.setStackTrace(ce.getStackTrace());
-            throw ne;
         }
 
         int size = name.size();
@@ -303,7 +269,8 @@ public class InfinispanDistributedTreeManager implements org.jnp.interfaces.Nami
         }
     }
 
-    public Collection<Binding> listBindings(Name name) throws NamingException {
+    @Override
+    public Collection<PseudoBinding> listBindings(Name name) throws NamingException {
         if (log.isTraceEnabled()) {
             log.trace("listBindings, name=" + name);
         }
@@ -324,20 +291,20 @@ public class InfinispanDistributedTreeManager implements org.jnp.interfaces.Nami
         if (!exists) {
             // not found in global jndi, look in local.
             try {
-                return Collections.list(new InitialContext().listBindings(name));
+                return PseudoBinding.convert(new InitialContext().listBindings(name));
             } catch (NamingException e) {
                 throw new NotContextException(ctxName + " not a context");
             }
         }
 
         try {
-            List<Binding> list = new LinkedList<Binding>();
+            List<PseudoBinding> list = new LinkedList<PseudoBinding>();
 
             Node<String, Binding> node = this.cache.getRoot().getChild(ctx);
             if (node != null) {
                 Map<String, Binding> data = node.getData();
                 if (data != null && !data.isEmpty()) {
-                    list.addAll(data.values());
+                    list.addAll(PseudoBinding.convert(data.values()));
                 }
 
                 // Why doesn't this return Set<String>?
@@ -347,8 +314,7 @@ public class InfinispanDistributedTreeManager implements org.jnp.interfaces.Nami
                         String child = (String) obj;
                         Name fullName = (Name) name.clone();
                         fullName.add(child);
-                        NamingContext subCtx = new NamingContext(null, fullName, this.getHAStub());
-                        list.add(new Binding(child, NamingContext.class.getName(), subCtx, true));
+                        list.add(new PseudoBinding(fullName, child));
                     }
                 }
             }
@@ -363,7 +329,7 @@ public class InfinispanDistributedTreeManager implements org.jnp.interfaces.Nami
     }
 
     @Override
-    public Context createSubcontext(Name name) throws NamingException {
+    public void createSubcontext(Name name) throws NamingException {
         if (log.isTraceEnabled()) {
             log.trace("createSubcontext, name=" + name);
         }
@@ -407,11 +373,6 @@ public class InfinispanDistributedTreeManager implements org.jnp.interfaces.Nami
             ne.setStackTrace(ce.getStackTrace());
             throw ne;
         }
-
-        Name fullName = parser.parse("");
-        fullName.addAll(name);
-
-        return new NamingContext(null, fullName, this.getHAStub());
     }
 
     private void putTreeRoot() throws CacheException {
@@ -458,5 +419,18 @@ public class InfinispanDistributedTreeManager implements org.jnp.interfaces.Nami
         }
 
         this.cache.put(ctx, key, new Binding(key, className, obj, true));
+    }
+
+    @Override
+    public boolean isContextName(Name name) throws NamingException {
+        try {
+            return this.cache.getRoot().getChild(Fqn.fromRelativeFqn(this.m_root, Fqn.fromString(name.toString()))) != null;
+        } catch (CacheException ce) {
+            // don't chain CacheException since JBoss Cache may not be on remote client's classpath
+            NamingException ne = new NamingException(ce.getClass().getName() + ": " + ce.getMessage());
+            ne.setStackTrace(ce.getStackTrace());
+            throw ne;
+        }
+
     }
 }

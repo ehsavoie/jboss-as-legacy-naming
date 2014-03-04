@@ -25,7 +25,8 @@ import java.net.UnknownHostException;
 import javax.naming.NamingException;
 import org.jboss.ha.jndi.HANamingService;
 import org.jboss.legacy.LegacyService;
-import org.jboss.legacy.jnp.infinispan.InfinispanDistributedTreeManager;
+import org.jboss.legacy.jnp.infinispan.HADistributedTreeManager;
+import org.jboss.legacy.jnp.infinispan.InfinispanDistributedCacheTree;
 import org.jboss.legacy.jnp.infinispan.InfinispanHAPartition;
 import org.jboss.legacy.jnp.server.NamingStore;
 import org.jboss.legacy.jnp.server.NamingStoreWrapper;
@@ -38,18 +39,18 @@ public class HAConnectorLegacyService extends LegacyService {
     
     private HANamingService haNamingService;
 
-    public HAConnectorLegacyService(NamingStore namingStore, InfinispanDistributedTreeManager distributedCache, InfinispanHAPartition partition, String bindAddress, int port)
+    public HAConnectorLegacyService(NamingStore namingStore, InfinispanDistributedCacheTree distributedCache, InfinispanHAPartition partition, String bindAddress, int port)
             throws UnknownHostException, NamingException {
         this.haNamingService = new HANamingService();
         NamingStoreWrapper singletonNamingServer = new NamingStoreWrapper(namingStore);
         this.haNamingService.setHAPartition(partition);
-        this.haNamingService.setDistributedTreeManager(distributedCache);
+        this.haNamingService.setDistributedTreeManager(new HADistributedTreeManager(distributedCache));
         this.haNamingService.setLocalNamingInstance(singletonNamingServer);
         haNamingService.setBindAddress(bindAddress);
         haNamingService.setPort(port);
     }
 
-    public HAConnectorLegacyService(NamingStore namingStore, InfinispanDistributedTreeManager distributedCache, InfinispanHAPartition partition, String bindAddress, int port, String rmiBindAddress, int rmiPort)
+    public HAConnectorLegacyService(NamingStore namingStore, InfinispanDistributedCacheTree distributedCache, InfinispanHAPartition partition, String bindAddress, int port, String rmiBindAddress, int rmiPort)
             throws UnknownHostException, NamingException {
         this(namingStore, distributedCache, partition, bindAddress, port);
         if (rmiBindAddress != null && !rmiBindAddress.isEmpty()) {

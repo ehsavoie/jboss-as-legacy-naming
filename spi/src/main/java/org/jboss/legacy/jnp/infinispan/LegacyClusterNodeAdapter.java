@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 import org.jboss.ha.framework.interfaces.ClusterNode;
-import org.jgroups.stack.IpAddress;
 
 /**
  *
@@ -34,9 +33,9 @@ import org.jgroups.stack.IpAddress;
  */
 public class LegacyClusterNodeAdapter implements ClusterNode {
 
-    private org.jboss.as.clustering.ClusterNode node;
+    private ClusterNodeProxy node;
 
-    public LegacyClusterNodeAdapter(org.jboss.as.clustering.ClusterNode node) {
+    public LegacyClusterNodeAdapter(ClusterNodeProxy node) {
         this.node = node;
     }
 
@@ -56,8 +55,7 @@ public class LegacyClusterNodeAdapter implements ClusterNode {
     }
 
     private String getId(ClusterNode node) {
-        IpAddress address = new IpAddress(node.getIpAddress(), node.getPort());
-        return address.getIpAddress().getHostAddress() + ":" + address.getPort();
+        return getIpAddress().getHostAddress() + ":" + getPort();
     }
 
     @Override
@@ -68,17 +66,17 @@ public class LegacyClusterNodeAdapter implements ClusterNode {
         return getId(this).compareTo(getId((ClusterNode) o));
     }
 
-    public static Vector convertToVector(List<org.jboss.as.clustering.ClusterNode> nodes) {
+    public static Vector convertToVector(List<ClusterNodeProxy> nodes) {
         Vector result = new Vector(nodes.size());
-        for (org.jboss.as.clustering.ClusterNode node : nodes) {
+        for (ClusterNodeProxy node : nodes) {
             result.add(new LegacyClusterNodeAdapter(node));
         }
         return result;
     }
 
-    public static ClusterNode[] convertToArray(List<org.jboss.as.clustering.ClusterNode> nodes) {
+    public static ClusterNode[] convertToArray(List<ClusterNodeProxy> nodes) {
         List<ClusterNode> result = new ArrayList<ClusterNode>(nodes.size());
-        for (org.jboss.as.clustering.ClusterNode node : nodes) {
+        for (ClusterNodeProxy node : nodes) {
             result.add(new LegacyClusterNodeAdapter(node));
         }
         return result.toArray(new ClusterNode[nodes.size()]);

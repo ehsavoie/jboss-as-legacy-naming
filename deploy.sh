@@ -1,6 +1,6 @@
 #!/bin/sh
 
-mvn clean install  -s config/settings.xml -Plegacy -Dcheckstyle.skip=true
+mvn clean install  -s config/settings.xml -Dcheckstyle.skip=true
 
 
 if [ "x$JBOSS_HOME" = "x" ]; then

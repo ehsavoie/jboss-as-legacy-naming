@@ -24,6 +24,10 @@
         <module name="org.jboss.marshalling.river" />
         <module name="org.jboss.marshalling" />
         <module name="org.apache.commons.logging" />
+        <module name="org.jboss.as.clustering.api"/>
+        <module name="org.jboss.as.clustering.impl" />
+        <module name="org.jboss.as.clustering.infinispan"/>
+        <module name="org.jboss.as.clustering.service" />
         <module name="javax.api" export="true"/>
     </dependencies>
 </module>

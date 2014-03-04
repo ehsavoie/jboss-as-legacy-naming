@@ -19,6 +19,7 @@
 
     <dependencies>
         <module name="org.jboss.logging"/>
+        <module name="javax.transaction.api"/> 
         <module name="javax.api" export="true"/>
     </dependencies>
 </module>

@@ -104,12 +104,12 @@ public class InfinispanHAPartition implements HAPartition {
 
     @Override
     public Object callMethodOnNode(String serviceName, String methodName, Object[] args, Class[] types, long methodTimeout, ClusterNode targetNode) throws Throwable {
-        return service.callMethodOnNode(serviceName, methodName, args, types, new ClusterNodeAdapter(targetNode));
+        return service.callMethodOnNode(serviceName, methodName, args, types, new ClusterNodeProxy(targetNode.getIpAddress(), targetNode.getName(), targetNode.getPort()));
     }
 
     @Override
     public void callAsyncMethodOnNode(String serviceName, String methodName, Object[] args, Class[] types, long methodTimeout, ClusterNode targetNode) throws Throwable {
-        service.callAsyncMethodOnNode(serviceName, methodName, args, types, new ClusterNodeAdapter(targetNode));
+        service.callAsyncMethodOnNode(serviceName, methodName, args, types, new ClusterNodeProxy(targetNode.getIpAddress(), targetNode.getName(), targetNode.getPort()));
     }
 
     @Override

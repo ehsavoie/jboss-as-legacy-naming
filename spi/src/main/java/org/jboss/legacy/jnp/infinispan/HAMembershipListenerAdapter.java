@@ -23,8 +23,6 @@ package org.jboss.legacy.jnp.infinispan;
 
 import java.util.List;
 import java.util.Vector;
-import org.jboss.as.clustering.ClusterNode;
-import org.jboss.as.clustering.GroupMembershipListener;
 import org.jboss.ha.framework.interfaces.HAPartition.HAMembershipExtendedListener;
 import org.jboss.ha.framework.interfaces.HAPartition.HAMembershipListener;
 
@@ -32,7 +30,7 @@ import org.jboss.ha.framework.interfaces.HAPartition.HAMembershipListener;
  *
  * @author <a href="mailto:ehugonne@redhat.com">Emmanuel Hugonnet</a> (c) 2013 Red Hat, inc.
  */
-public class HAMembershipListenerAdapter implements GroupMembershipListener {
+public class HAMembershipListenerAdapter implements ClusterListener {
 
     private final HAMembershipListener listener;
 
@@ -41,17 +39,17 @@ public class HAMembershipListenerAdapter implements GroupMembershipListener {
     }
 
     @Override
-    public void membershipChanged(List<ClusterNode> deadMembers, List<ClusterNode> newMembers, List<ClusterNode> allMembers) {
+    public void membershipChanged(List<ClusterNodeProxy> deadMembers, List<ClusterNodeProxy> newMembers, List<ClusterNodeProxy> allMembers) {
         listener.membershipChanged(LegacyClusterNodeAdapter.convertToVector(deadMembers),
                 LegacyClusterNodeAdapter.convertToVector(newMembers),
                 LegacyClusterNodeAdapter.convertToVector(allMembers));
     }
 
     @Override
-    public void membershipChangedDuringMerge(List<ClusterNode> deadMembers, List<ClusterNode> newMembers, List<ClusterNode> allMembers, List<List<ClusterNode>> originatingGroups) {
+    public void membershipChangedDuringMerge(List<ClusterNodeProxy> deadMembers, List<ClusterNodeProxy> newMembers, List<ClusterNodeProxy> allMembers, List<List<ClusterNodeProxy>> originatingGroups) {
         if (listener instanceof HAMembershipExtendedListener) {
             Vector groups = new Vector(originatingGroups.size());
-            for (List<ClusterNode> group : originatingGroups) {
+            for (List<ClusterNodeProxy> group : originatingGroups) {
                 groups.add(LegacyClusterNodeAdapter.convertToVector(group));
             }
             ((HAMembershipExtendedListener) listener).membershipChangedDuringMerge(LegacyClusterNodeAdapter.convertToVector(deadMembers),

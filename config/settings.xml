@@ -12,11 +12,9 @@
             <id>legacy</id>
             <activation>
                 <property>
-                    <name>legacy</name>
-                    <value>true</value>
+                     <name>!skipLegacy</name>
                 </property>
             </activation>
-
         <repositories>
         <repository>
             <releases>

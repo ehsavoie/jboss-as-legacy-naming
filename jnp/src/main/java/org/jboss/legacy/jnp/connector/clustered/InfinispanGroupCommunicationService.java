@@ -22,18 +22,17 @@ package org.jboss.legacy.jnp.connector.clustered;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Future;
 import org.jboss.as.clustering.ClusterNode;
-import org.jboss.as.clustering.GroupMembershipListener;
-import org.jboss.as.clustering.ResponseFilter;
-import org.jboss.as.clustering.SerializableStateTransferResult;
-import org.jboss.as.clustering.StateTransferProvider;
-import org.jboss.as.clustering.StreamStateTransferResult;
 import org.jboss.as.clustering.impl.CoreGroupCommunicationService;
+import org.jboss.legacy.jnp.infinispan.ClusterListener;
 import org.jboss.legacy.jnp.infinispan.ClusterNodeAdapter;
+import org.jboss.legacy.jnp.infinispan.ClusterNodeProxy;
+import org.jboss.legacy.jnp.infinispan.ClusterResponseFilter;
+import org.jboss.legacy.jnp.infinispan.ClusterResponseFilterAdapter;
+import org.jboss.legacy.jnp.infinispan.ClusterStateTransferProvider;
+import org.jboss.legacy.jnp.infinispan.ClusterStateTransferProviderAdapter;
+import org.jboss.legacy.jnp.infinispan.GroupMembershipListenerAdapter;
 import org.jboss.legacy.jnp.infinispan.HAGroupCommunicationService;
-import org.jboss.legacy.jnp.infinispan.ResponseFilterAdapter;
-import org.jboss.legacy.jnp.infinispan.StateTransferProviderAdapter;
 import org.jboss.msc.service.ServiceName;
 
 /**
@@ -73,14 +72,23 @@ public class InfinispanGroupCommunicationService implements HAGroupCommunication
     }
 
     @Override
-    public List<ClusterNode> getClusterNodes() {
-        return service.getClusterNodes();
+    public List<ClusterNodeProxy> getClusterNodes() {
+        List<ClusterNodeProxy> result = new ArrayList<ClusterNodeProxy>();
+        for(ClusterNode node : service.getClusterNodes()) {
+            result.add(new ClusterNodeProxy(node.getIpAddress(), node.getName(), node.getPort()));
+        }
+        return result;
     }
 
     @Override
-    public ClusterNode getClusterNode() {
-        return service.getClusterNode();
+    public ClusterNodeProxy getClusterNode() {
+        ClusterNode node = service.getClusterNode();
+        if (node != null) {
+            return new ClusterNodeProxy(node.getIpAddress(), node.getName(), node.getPort());
+        }
+        return null;
     }
+
     @Override
     public void registerRPCHandler(String objName, Object subscriber) {
         service.registerRPCHandler(objName, subscriber);
@@ -96,49 +104,24 @@ public class InfinispanGroupCommunicationService implements HAGroupCommunication
         return service.callMethodOnCluster(serviceName, methodName, args, types, excludeSelf);
     }
 
-    public List callMethodOnCluster(String serviceName, String methodName, Object[] args, Class[] types, boolean excludeSelf, ResponseFilter filter) throws Exception {
-        return service.callMethodOnCluster(serviceName, methodName, args, types, excludeSelf, filter);
+    @Override
+    public List callMethodOnCluster(String serviceName, String methodName, Object[] args, Class[] types, boolean excludeSelf, ClusterResponseFilter filter) throws Exception {
+        return service.callMethodOnCluster(serviceName, methodName, args, types, excludeSelf, new ClusterResponseFilterAdapter(filter));
     }
 
-    public List callMethodOnCluster(String serviceName, String methodName, Object[] args, Class[] types, boolean excludeSelf, ResponseFilter filter, long methodTimeout, boolean unordered) throws Exception {
-        return service.callMethodOnCluster(serviceName, methodName, args, types, excludeSelf, filter, methodTimeout, unordered);
+    @Override
+    public Object callMethodOnNode(String serviceName, String methodName, Object[] args, Class[] types, ClusterNodeProxy targetNode) throws Exception {
+        return service.callMethodOnNode(serviceName, methodName, args, types, new ClusterNodeAdapter(targetNode));
     }
 
-    public <T> T callMethodOnNode(String serviceName, String methodName, Object[] args, Class[] types, ClusterNode targetNode) throws Exception {
-        return service.callMethodOnNode(serviceName, methodName, args, types, targetNode);
-    }
-
-    public <T> T callMethodOnNode(String serviceName, String methodName, Object[] args, Class[] types, long methodTimeout, ClusterNode targetNode) throws Exception {
-        return service.callMethodOnNode(serviceName, methodName, args, types, methodTimeout, targetNode);
-    }
-
-    public <T> T callMethodOnNode(String serviceName, String methodName, Object[] args, Class[] types, long methodTimeout, ClusterNode targetNode, boolean unordered) throws Exception {
-        return service.callMethodOnNode(serviceName, methodName, args, types, methodTimeout, targetNode, unordered);
-    }
-
-    public void callAsyncMethodOnNode(String serviceName, String methodName, Object[] args, Class[] types, ClusterNode targetNode) throws Exception {
-        service.callAsyncMethodOnNode(serviceName, methodName, args, types, targetNode);
-    }
-
-    public void callAsyncMethodOnNode(String serviceName, String methodName, Object[] args, Class[] types, ClusterNode targetNode, boolean unordered) throws Exception {
-        service.callAsyncMethodOnNode(serviceName, methodName, args, types, targetNode, unordered);
+    @Override
+    public void callAsyncMethodOnNode(String serviceName, String methodName, Object[] args, Class[] types, ClusterNodeProxy targetNode) throws Exception {
+        service.callAsyncMethodOnNode(serviceName, methodName, args, types, new ClusterNodeAdapter(targetNode));
     }
 
     @Override
     public void callAsynchMethodOnCluster(String serviceName, String methodName, Object[] args, Class[] types, boolean excludeSelf) throws Exception {
         service.callAsynchMethodOnCluster(serviceName, methodName, args, types, excludeSelf);
-    }
-
-    public void callAsynchMethodOnCluster(String serviceName, String methodName, Object[] args, Class[] types, boolean excludeSelf, boolean unordered) throws Exception {
-        service.callAsynchMethodOnCluster(serviceName, methodName, args, types, excludeSelf, unordered);
-    }
-
-    public void callAsyncMethodOnCoordinatorNode(String serviceName, String methodName, Object[] args, Class[] types, boolean excludeSelf) throws Exception {
-        service.callAsyncMethodOnCoordinatorNode(serviceName, methodName, args, types, excludeSelf);
-    }
-
-    public void callAsyncMethodOnCoordinatorNode(String serviceName, String methodName, Object[] args, Class[] types, boolean excludeSelf, boolean unordered) throws Exception {
-        service.callAsyncMethodOnCoordinatorNode(serviceName, methodName, args, types, excludeSelf, unordered);
     }
 
     @Override
@@ -152,66 +135,27 @@ public class InfinispanGroupCommunicationService implements HAGroupCommunication
     }
 
     @Override
-    public void registerGroupMembershipListener(GroupMembershipListener listener) {
-        service.registerGroupMembershipListener(listener);
+    public void registerGroupMembershipListener(ClusterListener listener) {
+        service.registerGroupMembershipListener(new GroupMembershipListenerAdapter(listener));
     }
 
     @Override
-    public void unregisterGroupMembershipListener(GroupMembershipListener listener) {
-        service.unregisterGroupMembershipListener(listener);
+    public void unregisterGroupMembershipListener(ClusterListener listener) {
+        service.unregisterGroupMembershipListener(new GroupMembershipListenerAdapter(listener));
     }
 
-    public long getStateTransferTimeout() {
-        return service.getStateTransferTimeout();
-    }
-
-    public void setStateTransferTimeout(long timeout) {
-        service.setStateTransferTimeout(timeout);
-    }
-
-    public Future<SerializableStateTransferResult> getServiceState(String serviceName, ClassLoader classloader) {
-        return service.getServiceState(serviceName, classloader);
-    }
-
-    public Future<SerializableStateTransferResult> getServiceState(String serviceName) {
-        return service.getServiceState(serviceName);
-    }
-
-    public Future<StreamStateTransferResult> getServiceStateAsStream(String serviceName) {
-        return service.getServiceStateAsStream(serviceName);
-    }
-
-    public void registerStateTransferProvider(String serviceName, StateTransferProvider provider) {
-        service.registerStateTransferProvider(serviceName, provider);
+    @Override
+    public void registerStateTransferProvider(String serviceName, ClusterStateTransferProvider provider) {
+        service.registerStateTransferProvider(serviceName, new ClusterStateTransferProviderAdapter(provider));
     }
 
     @Override
     public void unregisterStateTransferProvider(String serviceName) {
         service.unregisterStateTransferProvider(serviceName);
     }
-
-    @Override
-    public List callMethodOnCluster(String serviceName, String methodName, Object[] args, Class[] types, boolean excludeSelf, ResponseFilterAdapter responseFilterAdapter) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
+    
     @Override
     public ArrayList callMethodOnCoordinatorNode(String serviceName, String methodName, Object[] args, Class[] types, boolean excludeSelf) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public Object callMethodOnNode(String serviceName, String methodName, Object[] args, Class[] types, ClusterNodeAdapter clusterNodeAdapter) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void callAsyncMethodOnNode(String serviceName, String methodName, Object[] args, Class[] types, ClusterNodeAdapter clusterNodeAdapter) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void registerStateTransferProvider(String serviceName, StateTransferProviderAdapter stateTransferProviderAdapter) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return service.callMethodOnCoordinatorNode(serviceName, methodName, args, types, excludeSelf);
     }
 }

@@ -25,7 +25,6 @@ import org.jboss.ha.jndi.HANamingService;
 import org.jboss.legacy.jnp.connector.clustered.HAConnectorLegacyService;
 import org.jboss.legacy.jnp.server.JNPServer;
 import org.jboss.legacy.jnp.server.LegacyJNPServerService;
-import org.jboss.msc.service.StartException;
 import org.jnp.interfaces.Naming;
 import org.jnp.server.NamingBean;
 
@@ -49,7 +48,7 @@ public class HAServerLegacyService  extends LegacyJNPServerService {
 
 
     @Override
-    public void internalStart() throws StartException {
+    public void internalStart() throws Exception {
         this.server = new JNPServer() {
             @Override
             public NamingBean getNamingBean() {

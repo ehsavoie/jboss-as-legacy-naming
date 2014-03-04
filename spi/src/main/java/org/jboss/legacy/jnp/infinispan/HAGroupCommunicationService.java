@@ -23,8 +23,6 @@ package org.jboss.legacy.jnp.infinispan;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.jboss.as.clustering.ClusterNode;
-import org.jboss.as.clustering.GroupMembershipListener;
 
 /**
  *
@@ -43,23 +41,23 @@ public interface HAGroupCommunicationService {
     public List callMethodOnCluster(String serviceName, String methodName, Object[] args, Class[] types, boolean excludeSelf) throws Exception;
 
     public List callMethodOnCluster(String serviceName, String methodName, Object[] args, Class[] types, boolean excludeSelf, 
-            ResponseFilterAdapter responseFilterAdapter) throws Exception;
+            ClusterResponseFilter responseFilter) throws Exception;
 
     public void callAsynchMethodOnCluster(String serviceName, String methodName, Object[] args, Class[] types, boolean excludeSelf) throws Exception;
 
     public ArrayList callMethodOnCoordinatorNode(String serviceName, String methodName, Object[] args, Class[] types, boolean excludeSelf) throws Exception;
 
-    public Object callMethodOnNode(String serviceName, String methodName, Object[] args, Class[] types, ClusterNodeAdapter clusterNodeAdapter) throws Exception;
+    public Object callMethodOnNode(String serviceName, String methodName, Object[] args, Class[] types, ClusterNodeProxy clusterNode) throws Exception;
 
-    public void callAsyncMethodOnNode(String serviceName, String methodName, Object[] args, Class[] types, ClusterNodeAdapter clusterNodeAdapter) throws Exception;
+    public void callAsyncMethodOnNode(String serviceName, String methodName, Object[] args, Class[] types, ClusterNodeProxy clusterNode) throws Exception;
 
-    public void registerStateTransferProvider(String serviceName, StateTransferProviderAdapter stateTransferProviderAdapter);
+    public void registerStateTransferProvider(String serviceName, ClusterStateTransferProvider stateTransferProvider);
 
     public void unregisterStateTransferProvider(String serviceName);
 
-    public void registerGroupMembershipListener(GroupMembershipListener get);
+    public void registerGroupMembershipListener(ClusterListener get);
 
-    public void unregisterGroupMembershipListener(GroupMembershipListener get);
+    public void unregisterGroupMembershipListener(ClusterListener get);
 
     public boolean getAllowSynchronousMembershipNotifications();
 
@@ -69,8 +67,8 @@ public interface HAGroupCommunicationService {
 
     public List<String> getCurrentView();
 
-    public List<ClusterNode> getClusterNodes();
+    public List<ClusterNodeProxy> getClusterNodes();
 
-    public ClusterNode getClusterNode();
+    public ClusterNodeProxy getClusterNode();
     
 }

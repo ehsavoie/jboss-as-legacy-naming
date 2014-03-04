@@ -22,14 +22,11 @@
 
 package org.jboss.legacy.jnp.infinispan;
 
-import org.jboss.as.clustering.ClusterNode;
-import org.jboss.as.clustering.ResponseFilter;
-
 /**
  *
  * @author <a href="mailto:ehugonne@redhat.com">Emmanuel Hugonnet</a> (c) 2013 Red Hat, inc.
  */
-public class ResponseFilterAdapter implements ResponseFilter {
+public class ResponseFilterAdapter implements ClusterResponseFilter {
 
     private final org.jboss.ha.framework.interfaces.ResponseFilter filter;
 
@@ -38,7 +35,7 @@ public class ResponseFilterAdapter implements ResponseFilter {
     }
 
     @Override
-    public boolean isAcceptable(Object response, ClusterNode sender) {
+    public boolean isAcceptable(Object response, ClusterNodeProxy sender) {
         return filter.isAcceptable(response, new LegacyClusterNodeAdapter(sender));
     }
 

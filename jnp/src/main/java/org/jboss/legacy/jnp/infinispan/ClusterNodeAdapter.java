@@ -22,6 +22,8 @@
 package org.jboss.legacy.jnp.infinispan;
 
 import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.List;
 import org.jboss.as.clustering.ClusterNode;
 import org.jgroups.stack.IpAddress;
 
@@ -31,9 +33,9 @@ import org.jgroups.stack.IpAddress;
  */
 public class ClusterNodeAdapter implements ClusterNode {
 
-    private final org.jboss.ha.framework.interfaces.ClusterNode node;
+    private final ClusterNodeProxy node;
 
-    public ClusterNodeAdapter(org.jboss.ha.framework.interfaces.ClusterNode node) {
+    public ClusterNodeAdapter(ClusterNodeProxy node) {
         this.node = node;
     }
 
@@ -56,9 +58,26 @@ public class ClusterNodeAdapter implements ClusterNode {
     public int compareTo(ClusterNode o) {
         return getId(this).compareTo(getId(o));
     }
+    
 
     private String getId(ClusterNode node) {
         IpAddress address = new IpAddress(node.getIpAddress(), node.getPort());
         return address.getIpAddress().getHostAddress() + ":" + address.getPort();
+    }
+    
+    public static List<ClusterNodeProxy> convertToList(List<ClusterNode> nodes) {
+        List<ClusterNodeProxy> result = new ArrayList<ClusterNodeProxy>(nodes.size());
+        for(ClusterNode node : nodes) {
+            result.add(new ClusterNodeProxy(node.getIpAddress(), node.getName(), node.getPort()));
+        }
+        return result;
+    }
+    
+    public static List<List<ClusterNodeProxy>> convertListOfList(List<List<ClusterNode>> nodes) {
+        List<List<ClusterNodeProxy>> result = new ArrayList<List<ClusterNodeProxy>>(nodes.size());
+        for(List<ClusterNode> list : nodes) {
+            result.add(convertToList(list));
+        }
+        return result;
     }
 }

@@ -5,11 +5,8 @@
     </resources>
 
     <dependencies>
-        <module name="org.jboss.legacy.naming.eap5" export="true"/>
-        <module name="org.infinispan"/>
-        <module name="org.jboss.as.clustering.api"/>
-        <module name="org.jboss.as.clustering.impl" />
-        <module name="org.jboss.as.clustering.infinispan"/>
-        <module name="org.jboss.as.clustering.service" />
+        <module name="org.jboss.legacy.naming.eap5" />
+        <module name="org.infinispan"export="true"/>
+        <module name="org.jboss.logging"/>
     </dependencies>
 </module>
