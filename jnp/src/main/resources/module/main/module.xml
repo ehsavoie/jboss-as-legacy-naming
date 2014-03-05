@@ -28,6 +28,6 @@
         <module name="org.jboss.as.clustering.impl" />
         <module name="org.jboss.as.clustering.infinispan"/>
         <module name="org.jboss.as.clustering.service" />
-        <module name="javax.api" export="true"/>
+        <module name="javax.api"/>
     </dependencies>
 </module>

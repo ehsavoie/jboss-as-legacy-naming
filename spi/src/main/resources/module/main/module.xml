@@ -5,8 +5,8 @@
     </resources>
 
     <dependencies>
+        <module name="org.infinispan" export="true"/>
         <module name="org.jboss.legacy.naming.eap5" />
-        <module name="org.infinispan"export="true"/>
         <module name="org.jboss.logging"/>
     </dependencies>
 </module>
