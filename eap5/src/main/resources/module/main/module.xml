@@ -15,11 +15,13 @@
         <resource-root path="lib/jboss-remoting.jar"/>
         <resource-root path="lib/jboss-security-spi.jar"/>
         <resource-root path="lib/jnpserver.jar"/>
+        <resource-root path="lib/jboss-logging-spi.jar"/>
+        <resource-root path="lib/jboss-serialization.jar"/>
     </resources>
 
     <dependencies>
-        <module name="org.jboss.logging"/>
         <module name="javax.transaction.api"/> 
         <module name="javax.api" export="true"/>
+        <module name="org.jboss.legacy.ejb3.eap5" optional="true"/>
     </dependencies>
 </module>
