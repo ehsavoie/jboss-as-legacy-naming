@@ -20,7 +20,6 @@
     </resources>
 
     <dependencies>
-        <module name="javax.transaction.api"/> 
         <module name="javax.api" export="true"/>
         <module name="org.jboss.legacy.ejb3.eap5" optional="true"/>
     </dependencies>
