@@ -4,9 +4,11 @@
     </resources>
 
     <dependencies>
-        <module name="org.jboss.legacy.naming.spi" export="true"/>
+        <module name="org.jboss.legacy.naming.spi" export="false"/>
         <module name="javax.jms.api" export="true"/>
         <module name="javax.security.jacc.api" export="true"/>
+        <module name="javax.api"/>
+
         <module name="org.jboss.staxmapper"/>
         <module name="org.jboss.as.controller"/>
         <module name="org.jboss.as.naming"/>
@@ -27,6 +29,6 @@
         <module name="org.jboss.as.clustering.impl" />
         <module name="org.jboss.as.clustering.infinispan"/>
         <module name="org.jboss.as.clustering.service" />
-        <module name="javax.api"/>
+
     </dependencies>
 </module>
