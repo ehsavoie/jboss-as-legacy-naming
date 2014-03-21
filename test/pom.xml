@@ -25,7 +25,7 @@
     <parent>
         <groupId>org.jboss.as.legacy</groupId>
         <artifactId>jboss-as-legacy-naming</artifactId>
-        <version>1.0.1-SNAPSHOT</version>
+        <version>1.1.0-SNAPSHOT</version>
     </parent>
     <groupId>org.jboss.as.legacy.naming</groupId>
     <artifactId>jboss-as-legacy-naming-test</artifactId>
@@ -200,9 +200,15 @@
                                                 <include name="**/standalone-full.xml" />
                                             </fileset>
                                         </xslt>
+                                        <xslt destdir="target/runtime/jboss-eap-6.2/standalone/configuration" style="src/test/resources/xslt/enableHAJNP.xsl" extension=".xml.mod" useImplicitFileset="false">
+                                            <fileset dir="target/runtime/jboss-eap-6.2/standalone/configuration">
+                                                <include name="**/standalone-full-ha.xml" />
+                                            </fileset>
+                                        </xslt>
                                         <move todir="target/runtime/jboss-eap-6.2/standalone/configuration">
                                             <fileset dir="target/runtime/jboss-eap-6.2/standalone/configuration">
                                                 <include name="**/standalone-full.xml.mod" />
+                                                <include name="**/standalone-full-ha.xml.mod" />
                                             </fileset>
                                             <mapper type="glob" from="*.mod" to="*" />
                                         </move>

@@ -30,7 +30,7 @@ MA 02110-1301  USA
     <includeBaseDirectory>false</includeBaseDirectory>
     <fileSets>
         <fileSet>
-            <directory>jnp/target/module</directory>
+            <directory>${project.parent.basedir}/jnp/target/module</directory>
             <outputDirectory>modules/system/layers/base</outputDirectory>
             <includes>
                 <include>**/*.*</include>
@@ -38,7 +38,7 @@ MA 02110-1301  USA
             <useDefaultExcludes>true</useDefaultExcludes>
         </fileSet>
         <fileSet>
-            <directory>eap5/target/module</directory>
+            <directory>${project.parent.basedir}/eap5/target/module</directory>
             <outputDirectory>modules/system/layers/base</outputDirectory>
             <includes>
                 <include>**/*.*</include>
@@ -46,7 +46,7 @@ MA 02110-1301  USA
             <useDefaultExcludes>true</useDefaultExcludes>
         </fileSet>
         <fileSet>
-            <directory>spi/target/module</directory>
+            <directory>${project.parent.basedir}/spi/target/module</directory>
             <outputDirectory>modules/system/layers/base</outputDirectory>
             <includes>
                 <include>**/*.*</include>
@@ -56,7 +56,7 @@ MA 02110-1301  USA
     </fileSets>
     <files>
         <file>
-            <source>README.md</source>
+            <source>${project.parent.basedir}/README.md</source>
             <outputDirectory></outputDirectory>
         </file>
     </files>

@@ -6,8 +6,7 @@
     Author     : ehsavoie
     Description: The aim is to enable the JNP extension with the matching socket-bindings
 -->
-
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
+  <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
                 xmlns:jnp10="urn:jboss:domain:legacy-jnp:1.0"
                 xmlns:domain15="urn:jboss:domain:1.5"
                 exclude-result-prefixes="domain15 jnp10">
@@ -52,6 +51,7 @@
                 <subsystem xmlns="urn:jboss:domain:legacy-jnp:1.0">
                     <jnp-server/>
                     <jnp-connector socket-binding="jnp" rmi-socket-binding="rmi-jnp" />
+                    <distributed-cache cache-container="singleton" cache-ref="default" />  
                 </subsystem>
             </xsl:otherwise>
         </xsl:choose>
