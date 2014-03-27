@@ -65,6 +65,14 @@ public class NamingStoreWrapper implements Naming {
     @Override
     public Object lookup(Name name) throws NamingException, RemoteException {
         try {
+            return lookupInternal(name);
+        } catch (Exception t) {
+            return lookupInternal(stripJBossExportedContext(name));
+        }
+    }
+
+    private Object lookupInternal(Name name) throws NamingException, RemoteException {
+        try {
             return singletonNamingServer.lookup(name);
         } catch (Exception t) {
             return namingStore.lookup(name);
@@ -102,5 +110,29 @@ public class NamingStoreWrapper implements Naming {
                 throw e;
             }
         }
+    }
+
+    protected Name stripJBossExportedContext(Name name) {
+        int index = getJBossExportedIndex(name);
+        if (index > 0) {
+            return name.getSuffix(index);
+        }
+        return name;
+    }
+
+    private int getJBossExportedIndex(Name name) {
+        boolean hasJboss = false;
+        for (int i = 0; i < name.size(); i++) {
+            String component = name.get(i);
+            if (hasJboss) {
+                if ("exported".equals(component)) {
+                    return i + 1;
+                }
+                return -1;
+            } else {
+                hasJboss = "jboss".equals(component) || "java:jboss".equals(component);
+            }
+        }
+        return -1;
     }
 }

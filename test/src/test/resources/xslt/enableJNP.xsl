@@ -8,9 +8,11 @@
 -->
 
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
-                xmlns:jnp10="urn:jboss:domain:legacy-jnp:1.0"
-                xmlns:domain15="urn:jboss:domain:1.5"
-                exclude-result-prefixes="domain15 jnp10">
+                xmlns:jnp="urn:jboss:domain:legacy-jnp:1.0"
+                xmlns:domain="urn:jboss:domain:1.5"
+                exclude-result-prefixes="domain jnp">
+    
+    <xsl:variable name="nsMessagingInf" select="'urn:jboss:domain:messaging:'"/>
 
     <xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes"/>
 
@@ -23,11 +25,11 @@
         </xsl:copy>
     </xsl:template>
 
-    <xsl:template match="//domain15:extensions">
+    <xsl:template match="//domain:extensions">
         <xsl:copy>
             <xsl:apply-templates />
             <xsl:choose>
-                <xsl:when test="//domain15:extension/@module='org.jboss.legacy.jnp'">
+                <xsl:when test="//domain:extension/@module='org.jboss.legacy.jnp'">
                 </xsl:when>
                 <xsl:otherwise>
                     <extension module="org.jboss.legacy.jnp" />
@@ -46,7 +48,7 @@
     <xsl:template match="//*[local-name()='subsystem'][last()]">
         <xsl:call-template name="copy" />
         <xsl:choose>
-            <xsl:when test="//jnp10:subsystem">
+            <xsl:when test="//jnp:subsystem">
             </xsl:when>
             <xsl:otherwise>
                 <subsystem xmlns="urn:jboss:domain:legacy-jnp:1.0">
@@ -57,12 +59,12 @@
         </xsl:choose>
     </xsl:template>
 
-    <xsl:template match="//domain15:socket-binding-group/domain15:socket-binding[last()]">
+    <xsl:template match="//domain:socket-binding-group/domain:socket-binding[last()]">
         <xsl:call-template name="copy" />
         <xsl:choose>
-            <xsl:when test="//domain15:socket-binding/@name='jnp'">
+            <xsl:when test="//domain:socket-binding/@name='jnp'">
             </xsl:when>
-            <xsl:when test="//domain15:socket-binding/@name='rmi-jnp'">
+            <xsl:when test="//domain:socket-binding/@name='rmi-jnp'">
             </xsl:when>
             <xsl:otherwise>
                 <socket-binding>
@@ -79,6 +81,25 @@
                     </xsl:attribute>
                     <xsl:attribute name="interface">public</xsl:attribute>
                 </socket-binding>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+     <xsl:template match="//*[local-name()='subsystem' and starts-with(namespace-uri(), $nsMessagingInf)]
+     					  /*[local-name()='hornetq-server']/*[local-name()='jms-connection-factories']">
+        <xsl:call-template name="copy" />
+        <xsl:choose>
+            <xsl:when test="//*[local-name()='jms-destinations']">
+            </xsl:when>
+            <xsl:otherwise>
+                <jms-destinations>
+                    <jms-queue name="eap6Queue">
+                        <entry name="jms/queue/eap6Queue"/>
+                    </jms-queue>
+                    <jms-queue name="eap6ReplyQueue">
+                        <entry name="jms/queue/eap6ReplyQueue"/>
+                    </jms-queue>
+                </jms-destinations>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>

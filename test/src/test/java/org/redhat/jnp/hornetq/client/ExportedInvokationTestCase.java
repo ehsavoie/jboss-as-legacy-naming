@@ -61,16 +61,16 @@ import org.redhat.jnp.hornetq.mdb.SimpleMDB;
  */
 @RunWith(Arquillian.class)
 @RunAsClient
-public class SimpleInvokationTestCase {
+public class ExportedInvokationTestCase {
 
-    private static final Logger log = Logger.getLogger(SimpleInvokationTestCase.class.getName());
+    private static final Logger log = Logger.getLogger(ExportedInvokationTestCase.class.getName());
 
-    private static final String QUEUE_JNDI_NAME = "jms/queue/eap6Queue";
-    private static final String REPLY_QUEUE_JNDI_NAME = "jms/queue/eap6ReplyQueue";
+    private static final String QUEUE_JNDI_NAME = "java:jboss/exported/jms/queue/eap6Queue";
+    private static final String REPLY_QUEUE_JNDI_NAME = "java:jboss/exported/jms/queue/eap6ReplyQueue";
     private static final String DEFAULT_CONNECTION_FACTORY = "java:jboss/exported/jms/RemoteConnectionFactory";
     private static final String JNDI_CONFIG = "jndi-eap6.properties";
     private static final String DEPLOYMENT = "ping-pong";
-    
+
     public static final String SERVER = "jbossas";
 
     @ArquillianResource
