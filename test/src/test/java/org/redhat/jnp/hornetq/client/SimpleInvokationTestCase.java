@@ -36,64 +36,97 @@ import javax.jms.TextMessage;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import org.hamcrest.Matchers;
+import org.jboss.arquillian.container.test.api.ContainerController;
+import org.jboss.arquillian.container.test.api.Deployer;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.as.arquillian.api.ServerSetup;
+import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.as.arquillian.api.ServerSetupTask;
 import org.jboss.as.arquillian.container.ManagementClient;
 import org.jboss.as.test.integration.common.jms.JMSOperations;
 import org.jboss.as.test.integration.common.jms.JMSOperationsProvider;
+import org.jboss.as.test.shared.TestSuiteEnvironment;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.redhat.jnp.hornetq.mdb.SimpleMDB;
 
 /**
  *
- * @author <a href="mailto:ehugonne@redhat.com">Emmanuel Hugonnet</a> (c) 2013 Red Hat, inc.
+ * @author <a href="mailto:ehugonne@redhat.com">Emmanuel Hugonnet</a> (c) 2014 Red Hat, inc.
  */
 @RunWith(Arquillian.class)
-@ServerSetup({SimpleInvokationTestCase.JmsQueueSetup.class})
 @RunAsClient
 public class SimpleInvokationTestCase {
-    
+
     private static final Logger log = Logger.getLogger(SimpleInvokationTestCase.class.getName());
 
     private static final String QUEUE_JNDI_NAME = "jms/queue/eap6Queue";
     private static final String REPLY_QUEUE_JNDI_NAME = "jms/queue/eap6ReplyQueue";
     private static final String DEFAULT_CONNECTION_FACTORY = "java:jboss/exported/jms/RemoteConnectionFactory";
     private static final String JNDI_CONFIG = "jndi-eap6.properties";
-    
+    private static final String DEPLOYMENT = "ping-pong";
+
+    private final JmsQueueSetup setup = new JmsQueueSetup();
+    public static final String SERVER = "jbossas";
+
+    @ArquillianResource
+    private static ContainerController containerController;
+
+    ManagementClient managementClient = new ManagementClient(TestSuiteEnvironment.getModelControllerClient(),
+            TestSuiteEnvironment.getServerAddress(), TestSuiteEnvironment.getServerPort());
+
+    @ArquillianResource
+    Deployer deployer;
+
+    @Before
+    public void initServer() throws Exception {
+        containerController.start(SERVER);
+        if (containerController.isStarted(SERVER)) {
+            setup.setup(managementClient, SERVER);
+            deployer.deploy(DEPLOYMENT);
+        }
+    }
+
+    @After
+    public void closeServer() throws Exception {
+        if (containerController.isStarted(SERVER)) {
+            setup.tearDown(managementClient, SERVER);
+            containerController.stop(SERVER);
+        }
+    }
+
     private InitialContext getInitialContext() throws NamingException, IOException {
         Properties jndiProperties = new Properties();
         jndiProperties.load(this.getClass().getClassLoader().getResourceAsStream(System.getProperty("jndi_config", JNDI_CONFIG)));
         return new javax.naming.InitialContext(jndiProperties);
     }
-    
-    @Deployment
-    public static Archive createDeployment() {
 
+    @Deployment(name = DEPLOYMENT, testable = false, managed = false)
+    public static Archive createDeployment() {
         final JavaArchive jar = ShrinkWrap.create(JavaArchive.class, "ping-pong.jar");
         jar.addClasses(SimpleMDB.class, JmsQueueSetup.class);
         jar.addPackage(JMSOperations.class.getPackage());
         return jar;
     }
-    
+
     @Test
     public void testSendMessages() throws Exception {
         List<String> responses = sendMessage("Hello World!", "Bye bye world!");
         Assert.assertThat(responses, Matchers.is(Matchers.notNullValue()));
-        
+
     }
 
     private List<String> sendMessage(String... messages) throws Exception {
         InitialContext initialContext = getInitialContext();
         Connection connection = null;
-        List<String>  responses = new ArrayList<String>(messages.length);
+        List<String> responses = new ArrayList<String>(messages.length);
         try {
             // Step 1. Perfom a lookup on the queue
             Destination destination = lookupDestination(initialContext);
@@ -122,7 +155,7 @@ public class SimpleInvokationTestCase {
                 TextMessage message = (TextMessage) consumer.receive(1000);
                 if (message != null) {
                     System.out.println("Reading message: " + message.getText());
-                    responses.add( message.getText());
+                    responses.add(message.getText());
                 } else {
                     break;
                 }

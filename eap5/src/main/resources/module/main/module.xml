@@ -20,6 +20,7 @@
     </resources>
 
     <dependencies>
+        <module name="javax.transaction.api" export="true"/>
         <module name="javax.api" export="true"/>
         <module name="javax.transaction.api" export="true"/>
         <module name="org.jboss.jboss-transaction-spi" export="true"/>

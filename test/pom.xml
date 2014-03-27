@@ -112,6 +112,7 @@
         <dependency>
             <groupId>org.jboss.cluster</groupId>
             <artifactId>jboss-ha-client</artifactId>
+            <scope>test</scope>
             <exclusions>
                 <exclusion>
                     <groupId>org.jboss.aspects</groupId>
@@ -126,6 +127,59 @@
         <dependency>
             <groupId>org.jboss.client</groupId>
             <artifactId>jboss-client</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.jbossas</groupId>
+            <artifactId>jboss-as-cluster</artifactId>
+            <version>5.1.0.GA</version>
+            <classifier>jboss-ha-legacy-client</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jboss.jbossas</groupId>
+                    <artifactId>jboss-as-server</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>jgroups</groupId>
+                    <artifactId>jgroups</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jboss.cluster</groupId>
+                    <artifactId>jboss-ha-server-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jboss.cluster</groupId>
+                    <artifactId>jboss-ha-server-cache-spi</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jboss.cluster</groupId>
+                    <artifactId>jboss-ha-server-jbc</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jboss.cluster</groupId>
+                    <artifactId>jboss-ha-server-cache-jbc</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jboss.jbossas</groupId>
+                    <artifactId>jboss-as-system-jmx</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jboss.jbossas</groupId>
+                    <artifactId>jboss-as-system</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jboss.bootstrap</groupId>
+                    <artifactId>jboss-bootstrap</artifactId>
+                </exclusion>                
+                <exclusion>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>jboss.web</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
 
@@ -137,12 +191,14 @@
         <!-- IP address defaults. -->
         <node0>127.0.0.1</node0>
         <node1>127.0.0.1</node1>
+        <node2>127.0.0.1</node2>
         <mcast>230.0.0.4</mcast> <!-- Default multicast address. -->
 
         <!-- IP stack configs. -->
         <jvm.args.ip>-Djava.net.preferIPv4Stack=true -Djava.net.preferIPv6Addresses=false</jvm.args.ip>
         <jvm.args.ip.server>${jvm.args.ip}</jvm.args.ip.server>
         <jvm.args.ip.client>${jvm.args.ip}</jvm.args.ip.client>
+        <server.jvm.args>${jvm.args.ip.server} -Dnode0=${node0} -Dnode1=${node1} -Dnode1=${node2} -Dmcast=${mcast}</server.jvm.args>
 
 
         <!-- Timeout ratios. 100 will leave the timeout as it was coded. -->
@@ -153,7 +209,7 @@
         <surefire.memory.args>-Xmx512m -XX:MaxPermSize=256m</surefire.memory.args>
         <surefire.jpda.args />
         <as.debug.port>8787</as.debug.port>
-        <surefire.system.args>${surefire.memory.args} ${surefire.jpda.args} -Djboss.dist=${jboss.dist}</surefire.system.args>
+        <surefire.system.args>${surefire.memory.args} ${surefire.jpda.args}</surefire.system.args>
         <surefire.forked.process.timeout>1500</surefire.forked.process.timeout>
 
         <jbossas.eap6.zip><!-- To be defined --></jbossas.eap6.zip>
@@ -170,6 +226,25 @@
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
+                </configuration>
+            </plugin>
+            
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!--<redirectTestOutputToFile>true</redirectTestOutputToFile>
+                    <enableAssertions>true</enableAssertions>-->
+                    <argLine>${server.jvm.args} -Dts.timeout.factor=100 -XX:MaxPermSize=128m</argLine>
+                    <!-- Parameters to test cases. -->
+                    <systemPropertyVariables combine.children="append">
+                        <arquillian.launch>ha-jnp</arquillian.launch>
+                        <server.jvm.args>${server.jvm.args}</server.jvm.args>
+                        <node0>${node0}</node0>
+                        <node1>${node1}</node1>
+                        <node2>${node2}</node2>
+                        <mcast>230.0.0.4</mcast>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
             <plugin>
@@ -195,20 +270,26 @@
                                         <chmod dir="target/runtime/jboss-eap-6.2" perm="ugo+rx" includes="**/*.sh" />
 
                                         <echo message="Enabling JNP for EAP6." />
-                                        <xslt destdir="target/runtime/jboss-eap-6.2/standalone/configuration" style="src/test/resources/xslt/enableJNP.xsl" extension=".xml.mod" useImplicitFileset="false">
+                                        <xslt destdir="target/runtime/jboss-eap-6.2/standalone/configuration" style="src/test/resources/xslt/enableJNP.xsl" extension="-jnp.xml.mod" useImplicitFileset="false">
                                             <fileset dir="target/runtime/jboss-eap-6.2/standalone/configuration">
                                                 <include name="**/standalone-full.xml" />
                                             </fileset>
                                         </xslt>
-                                        <xslt destdir="target/runtime/jboss-eap-6.2/standalone/configuration" style="src/test/resources/xslt/enableHAJNP.xsl" extension=".xml.mod" useImplicitFileset="false">
+                                        <xslt destdir="target/runtime/jboss-eap-6.2/standalone/configuration" style="src/test/resources/xslt/enableHAJNP-backup.xsl" extension="-jnp-backup.xml.mod" useImplicitFileset="false">
+                                            <fileset dir="target/runtime/jboss-eap-6.2/standalone/configuration">
+                                                <include name="**/standalone-full-ha.xml" />
+                                            </fileset>
+                                        </xslt>
+                                        <xslt destdir="target/runtime/jboss-eap-6.2/standalone/configuration" style="src/test/resources/xslt/enableHAJNP.xsl" extension="-jnp.xml.mod" useImplicitFileset="false">
                                             <fileset dir="target/runtime/jboss-eap-6.2/standalone/configuration">
                                                 <include name="**/standalone-full-ha.xml" />
                                             </fileset>
                                         </xslt>
                                         <move todir="target/runtime/jboss-eap-6.2/standalone/configuration">
                                             <fileset dir="target/runtime/jboss-eap-6.2/standalone/configuration">
-                                                <include name="**/standalone-full.xml.mod" />
-                                                <include name="**/standalone-full-ha.xml.mod" />
+                                                <include name="**/standalone-full-jnp.xml.mod" />
+                                                <include name="**/standalone-full-ha-jnp.xml.mod" />
+                                                <include name="**/standalone-full-ha-jnp-backup.xml.mod" />
                                             </fileset>
                                             <mapper type="glob" from="*.mod" to="*" />
                                         </move>
