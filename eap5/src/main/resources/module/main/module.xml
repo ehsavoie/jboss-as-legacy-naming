@@ -24,6 +24,8 @@
 
 <module xmlns="urn:jboss:module:1.0" name="org.jboss.legacy.naming.eap5">
     <resources>
+        <resource-root path="jboss-as-legacy-naming-eap5.jar"/>
+
         <resource-root path="lib/concurrent.jar"/>
         <resource-root path="lib/jboss-as-cluster.jar"/>
         <resource-root path="lib/jboss-as-j2se.jar"/>
