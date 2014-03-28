@@ -30,6 +30,7 @@ import javax.naming.NameClassPair;
 import javax.naming.NamingException;
 import org.jnp.interfaces.Naming;
 import org.jnp.interfaces.NamingContext;
+import org.jnp.interfaces.NamingParser;
 import org.jnp.server.SingletonNamingServer;
 
 /**
@@ -38,13 +39,18 @@ import org.jnp.server.SingletonNamingServer;
  * @author <a href="mailto:ehugonne@redhat.com">Emmanuel Hugonnet</a> (c) 2014 Red Hat, inc.
  */
 public class NamingStoreWrapper implements Naming {
+    private static final NamingParser parser = new NamingParser();
 
-    private final SingletonNamingServer singletonNamingServer;
+    private final Naming singletonNamingServer;
     private final NamingStore namingStore;
 
     public NamingStoreWrapper(NamingStore namingStore) throws NamingException {
+        this(namingStore, new SingletonNamingServer());
+    }
+    
+    protected NamingStoreWrapper(NamingStore namingStore, Naming singletonNamingServer) throws NamingException {
         this.namingStore = namingStore;
-        this.singletonNamingServer = new SingletonNamingServer();
+        this.singletonNamingServer = singletonNamingServer;
         NamingContext.setLocal(this);
     }
 
@@ -68,7 +74,10 @@ public class NamingStoreWrapper implements Naming {
         try {
             return lookupInternal(name);
         } catch (Exception t) {
-            return lookupInternal(stripJBossExportedContext(name));
+           if(hasExportedPrefix(name)) {
+                return lookupInternal(stripJBossExportedContext(name));
+            } 
+            return lookupInternal(parser.parse("java:jboss/exported/" + name.toString()));
         }
     }
 
@@ -111,6 +120,10 @@ public class NamingStoreWrapper implements Naming {
                 throw e;
             }
         }
+    }
+    
+    private boolean hasExportedPrefix(Name name) {
+       return getJBossExportedIndex(name) >=0;
     }
 
     protected Name stripJBossExportedContext(Name name) {

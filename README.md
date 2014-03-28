@@ -75,8 +75,8 @@ This tool uses the curent extension but to avoid any compatibility issue **DO NO
     </socket-binding-group> 
 
 #Client calls
-    
-    It is possible to enable backward calls from EAP6 to EAP5. In order to do so:
+
+It is possible to enable backward calls from EAP6 to EAP5. In order to do so:
     1. EAP6 has to define external-context factory
     2. This extension lib module must have all required dependencies linked
     
