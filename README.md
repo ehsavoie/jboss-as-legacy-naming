@@ -13,12 +13,37 @@ This extension is there to facilitate the migration from EAP 5 to EAP6, as such 
 
 _Being a migration tool there won't be any backport, only the latest greatest version (so no backports) is supported within the same lifecycle as EAP 5.3_.
 
-Another tool exists for adding support to remote EJB 3 invokation and use of UserTransaction iwith an EAP 5 client.  
+Another tool exists for adding support to remote EJB 3 invokation and use of UserTransaction with an EAP 5 client.  
 This tool uses the curent extension but to avoid any compatibility issue **DO NOT INSTALL THIS MODULE YOURSELF** if you are using or about to use the 
 jboss-as-legacy extension.
 
+#Configuration parameters
+ - *jnp-connector* : mandatory element
+    - _socket-binding_ : mandatory, defines the port used for te JNP server.
+    - _rmi-socket-binding_ : optionnal, defines the port used for RMI connection. If it is not defined it will default to *1099*.
+ - *distributed-cache* : optionnal element
+    - _cache-container_ : name of the cache container to use.
+    - _cache-ref_ : name of the cache in the cache container to use.
 
-#Full configuration example
+##Minimal configuration example
+
+    <extensions>  
+    ...  
+      <extension module="org.jboss.legacy.jnp"/>  
+    </extensions>  
+    ...  
+    <subsystem xmlns="urn:jboss:domain:legacy-jnp:1.0">  
+      <jnp-server/>  
+      <jnp-connector socket-binding="jnp" />
+    </subsystem>    
+    ...  
+    <socket-binding-group>  
+      ...  
+      <socket-binding name="jnp" port="5599" interface="jnp"/>  
+      ...  
+    </socket-binding-group> 
+
+##Full configuration example
 
     <extensions>  
     ...  
@@ -51,30 +76,20 @@ jboss-as-legacy extension.
     </socket-binding-group> 
     
 #Build
-
 ##Simple build
-
 Run _build.sh_  
-
 ##Build and Test
-
 Download a zip archive of EAP 6.2.1 (at least).   
 Run _build.sh -Djbossas.eap6.zip=/path to archive/jboss-eap-6.2.1-full-build.zip_  
-
-#Build and deploy
-
+##Build and deploy
 Download and install EAP 6.2.1 (at least). 
 Define the environment variable $JBOSS_HOME pointing towards your EAP6 installation.  
 Run _deploy.sh_   
-Define your configuration in the EAP6 server.  
-
+Define your configuration in the EAP6 server. 
 #Installation
-
 Download the zip or tar.gz archive of the extension.  
 Unarchive it in the EAP6 installation directory.  
 Define your configuration in the EAP6 server. 
-
 #Uninstallation
-
 Remove the configuration entries from your JBoss configuration file.  
 Delete the folder _$JBOSS_HOME/modules/system/layers/base/org/jboss/legacy/_
