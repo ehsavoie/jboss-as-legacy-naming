@@ -21,7 +21,6 @@
  */
 package org.jboss.legacy.jnp.infinispan;
 
-import java.rmi.Naming;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -60,7 +59,6 @@ public class InfinispanDistributedTreeManager implements InfinispanDistributedCa
 
     private TreeCache<String, Binding> cache;
     private Fqn m_root;
-    private Naming haStub;
     private boolean treeRootSet;
     protected boolean acquiredCache = false;
 
