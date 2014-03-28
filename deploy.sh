@@ -8,7 +8,7 @@ if [ "x$JBOSS_HOME" = "x" ]; then
     echo "Set ENV JBOSS_HOME!"
     return 1
 fi
-
+rm -Rf $JBOSS_HOME/modules/system/layers/base/org/jboss/legacy/
 cp -Rf eap5/target/module/org $JBOSS_HOME/modules/system/layers/base/
 cp -Rf spi/target/module/org $JBOSS_HOME/modules/system/layers/base/
 cp -Rf jnp/target/module/org $JBOSS_HOME/modules/system/layers/base/
@@ -23,7 +23,6 @@ echo "2. Add subsystem definition"
 echo "<subsystem xmlns=\"urn:jboss:domain:legacy-jnp:1.0\">"
 echo "    <jnp-server/>"
 echo "    <jnp-connector socket-binding=\"jnp\" rmi-socket-binding=\"rmi-jnp\" />"
-#echo "    <remoting socket-binding=\"legacy-remoting\"/>"
 echo "</subsystem>"
 echo
 echo "3. Define a socket-binding for the JNP Server using the 'jnp' name"

@@ -3,14 +3,20 @@ jboss-as-legacy-naming
 
 #Legacy Naming extension
 
-The full documentation is at https://mojo.redhat.com/docs/DOC-938349
+The full documentation is at https://mojo.redhat.com/docs/DOC-950104
 
 EAP5 used a different naming and remote protocols than EAP6. 
-Thus when you want to interact with EAP6 from an EAP5 client (or server) you are confronted with a lot of issues.
+Thus when you want to interact with EAP6 from an EAP5 client (or server) you are confronted with a lot of issues.  
+One solution would be to upgrade your client to EAP6, but sometimes this is not as simple as it seems.  
+For these cases we have developed a set of extensions for seamless integration of legacy clients with EAP6 and above.  
+This extension is there to facilitate the migration from EAP 5 to EAP6, as such it is supported only as long as EAP 5 support last.  
 
-One solution would be to upgrade your client to EAP6, but sometimes this is not as simple as it seems.
+_Being a migration tool there won't be any backport, only the latest greatest version (so no backports) is supported within the same lifecycle as EAP 5.3_.
 
-For these cases we have developed a set of extensions for seamless integration of legacy clients with EAP6 and above.
+Another tool exists for adding support to remote EJB 3 invokation and use of UserTransaction iwith an EAP 5 client.  
+This tool uses the curent extension but to avoid any compatibility issue **DO NOT INSTALL THIS MODULE YOURSELF** if you are using or about to use the 
+jboss-as-legacy extension.
+
 
 #Full configuration example
 
@@ -21,7 +27,8 @@ For these cases we have developed a set of extensions for seamless integration o
     ...  
     <subsystem xmlns="urn:jboss:domain:legacy-jnp:1.0">  
       <jnp-server/>  
-      <jnp-connector socket-binding="jnp" rmi-socket-binding="rmi-jnp" />  
+      <jnp-connector socket-binding="jnp" rmi-socket-binding="rmi-jnp" />
+      <!-- Reference to the Infinispan cache that will be used -->
       <distributed-cache cache-container="singleton" cache-ref="default" />  
     </subsystem>
     ...
@@ -47,28 +54,27 @@ For these cases we have developed a set of extensions for seamless integration o
 
 ##Simple build
 
-Run _build.sh_
+Run _build.sh_  
 
 ##Build and Test
 
-Download a zip archive of EAP 6.2.1 (at least).
-
-Run _build.sh -Djbossas.eap6.zip=/path to archive/jboss-eap-6.2.1-full-build.zip_
+Download a zip archive of EAP 6.2.1 (at least).   
+Run _build.sh -Djbossas.eap6.zip=/path to archive/jboss-eap-6.2.1-full-build.zip_  
 
 #Build and deploy
 
-Download and install EAP 6.2.1 (at least).
-
-Define the environment variable $JBOSS_HOME pointing towards your EAP6 installation.
-
-Run _deploy.sh_
-
-Define your configuration in the EAP6 server.
+Download and install EAP 6.2.1 (at least). 
+Define the environment variable $JBOSS_HOME pointing towards your EAP6 installation.  
+Run _deploy.sh_   
+Define your configuration in the EAP6 server.  
 
 #Installation
 
-Download the zip or tar.gz archive of the extension.
-
-Unarchive it in the EAP6 installation directory.
-
+Download the zip or tar.gz archive of the extension.  
+Unarchive it in the EAP6 installation directory.  
 Define your configuration in the EAP6 server. 
+
+#Uninstallation
+
+Remove the configuration entries from your JBoss configuration file.  
+Delete the folder _$JBOSS_HOME/modules/system/layers/base/org/jboss/legacy/_
