@@ -32,6 +32,7 @@ MA 02110-1301  USA
                 exclude-result-prefixes="domain jnp logging messaging">
 
     <xsl:variable name="nsMessagingInf" select="'urn:jboss:domain:messaging:'"/>
+    <xsl:variable name="nsDomainInf" select="'urn:jboss:domain:'"/>
 
     <xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes"/>
 
@@ -44,11 +45,11 @@ MA 02110-1301  USA
         </xsl:copy>
     </xsl:template>
 
-    <xsl:template match="//domain:extensions">
+    <xsl:template match="//*[local-name()='extensions' and starts-with(namespace-uri(), $nsDomainInf)]">
         <xsl:copy>
             <xsl:apply-templates />
             <xsl:choose>
-                <xsl:when test="//domain:extension/@module='org.jboss.legacy.jnp'">
+                <xsl:when test="//*[local-name()='extensions']/*[local-name()='extension']/@module='org.jboss.legacy.jnp'">
                 </xsl:when>
                 <xsl:otherwise>
                     <extension module="org.jboss.legacy.jnp" />
@@ -79,12 +80,12 @@ MA 02110-1301  USA
         </xsl:choose>
     </xsl:template>
 
-    <xsl:template match="//domain:socket-binding-group/domain:socket-binding[last()]">
+    <xsl:template match="//*[local-name()='socket-binding-group']/*[local-name()='socket-binding'][last()]">
         <xsl:call-template name="copy" />
         <xsl:choose>
-            <xsl:when test="//domain:socket-binding/@name='jnp'">
+            <xsl:when test="//*[local-name()='socket-binding-group']/*[local-name()='socket-binding']/@name='jnp'">
             </xsl:when>
-            <xsl:when test="//domain:socket-binding/@name='rmi-jnp'">
+            <xsl:when test="//*[local-name()='socket-binding-group']/*[local-name()='socket-binding']/@name='rmi-jnp'">
             </xsl:when>
             <xsl:otherwise>
                 <socket-binding>
