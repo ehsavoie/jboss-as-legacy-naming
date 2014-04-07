@@ -41,6 +41,7 @@
 
     <modules>
         <module>eap5</module>
+        <module>spi-server</module>
         <module>spi</module>
         <module>jnp</module>
         <module>dist</module>

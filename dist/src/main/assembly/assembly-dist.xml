@@ -53,6 +53,14 @@ MA 02110-1301  USA
             </includes>
             <useDefaultExcludes>true</useDefaultExcludes>
         </fileSet>
+        <fileSet>
+            <directory>${project.parent.basedir}/spi-server/target/module</directory>
+            <outputDirectory>modules/system/layers/base</outputDirectory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <useDefaultExcludes>true</useDefaultExcludes>
+        </fileSet>
     </fileSets>
     <files>
         <file>
