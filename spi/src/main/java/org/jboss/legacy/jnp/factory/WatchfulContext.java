@@ -449,7 +449,7 @@ public class WatchfulContext implements Context {
          */
         private JBossSecurityContext createLocalContext() throws Exception {
             final JBossSecurityContextProxy contextProxy = SecurityUtil.wrapCurrentContext();
-            if (contextProxy == null) {
+            if (contextProxy == null || contextProxy.getSubjectInfo().getAuthenticatedSubject() == null) {
                 return null;
             }
             final JBossSecurityContext newContext = (JBossSecurityContext) SecurityContextFactory
