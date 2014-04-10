@@ -29,7 +29,7 @@ import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
-
+import org.jboss.legacy.jnp.JNPLogger;
 /**
  *
  * @author <a href="mailto:ehugonne@redhat.com">Emmanuel Hugonnet</a> (c) 2013 Red Hat, inc.
@@ -42,8 +42,9 @@ public class DistributedTreeManagerService implements Service<InfinispanDistribu
 
     @Override
     public void start(StartContext context) throws StartException {
-            this.treeManager = new InfinispanDistributedTreeManager();
-            this.treeManager.setClusteredCache(cache.getValue());
+        JNPLogger.ROOT_LOGGER.startDistributedCache();
+        this.treeManager = new InfinispanDistributedTreeManager();
+        this.treeManager.setClusteredCache(cache.getValue());
     }
 
     @Override
@@ -53,6 +54,7 @@ public class DistributedTreeManagerService implements Service<InfinispanDistribu
 
     @Override
     public InfinispanDistributedTreeManager getValue() throws IllegalStateException, IllegalArgumentException {
+        JNPLogger.ROOT_LOGGER.startDistributedCache();
         return this.treeManager;
     }
 

@@ -26,6 +26,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Hashtable;
+import java.util.Set;
 
 import javax.naming.Binding;
 import javax.naming.Context;
@@ -34,6 +35,15 @@ import javax.naming.NameClassPair;
 import javax.naming.NameParser;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
+
+import org.jboss.legacy.jnp.security.CredentialIdentityProxy;
+import org.jboss.legacy.jnp.security.JBossSecurityContextProxy;
+import org.jboss.legacy.jnp.security.SecurityUtil;
+import org.jboss.legacy.jnp.security.SubjectInfoProxy;
+import org.jboss.security.SecurityContext;
+import org.jboss.security.SecurityContextAssociation;
+import org.jboss.security.SecurityContextFactory;
+import org.jboss.security.plugins.JBossSecurityContext;
 
 /**
  * Context which wraps around another one. This context should be used when wrapped context operate in different classloader
@@ -48,12 +58,11 @@ import javax.naming.NamingException;
  */
 public class WatchfulContext implements Context {
 
-    private final Object classLoaderLock = new Object();
-    private ClassLoader classLoader;
-
+    private volatile ClassLoader classLoader;
+    // private String name;
     private final Context wrappedContext;
 
-    public WatchfulContext(Context wrappedContext) {
+    public WatchfulContext(Context wrappedContext) throws NamingException {
         super();
         this.wrappedContext = wrappedContext;
     }
@@ -74,6 +83,7 @@ public class WatchfulContext implements Context {
 
     public Object lookup(String name) throws NamingException {
         final ClassLoader classLoader = SecurityActions.getContextClassLoader();
+
         try {
             SecurityActions.setContextClassLoader(getWatchfulClassLoader());
             Object o = wrappedContext.lookup(name);
@@ -358,29 +368,40 @@ public class WatchfulContext implements Context {
 
     protected ClassLoader getWatchfulClassLoader() {
 
-        if (this.classLoader == null) {
-            synchronized (this.classLoaderLock) {
-                if (this.classLoader != null)
-                    return this.classLoader;
+        ClassLoader result = this.classLoader;
+        if (result == null) {
+            synchronized (this) {
+                result = this.classLoader;
+                if (result != null)
+                    return result;
 
                 // use module?
                 final ClassLoader eap5EnabledClassLoader = this.getClass().getClassLoader();
-                // contains classes for deserialization in eap5EnabledClassLoader
+                // deployment/invocation class loader, to load interface for Proxy
                 final ClassLoader invocationClassLoader = SecurityActions.getContextClassLoader();
-                this.classLoader = new WatchfulClassLoader(eap5EnabledClassLoader, invocationClassLoader);
+                this.classLoader = result = new WatchfulClassLoader(eap5EnabledClassLoader, invocationClassLoader);
             }
         }
 
-        return this.classLoader;
+        return result;
     }
 
-    private Object decorate(Object o, ClassLoader classLoader) {
+    protected Object decorate(Object o, ClassLoader classLoader) {
         Proxy toWrap = (Proxy) o;
         Class[] interfaces = toWrap.getClass().getInterfaces();
         return Proxy.newProxyInstance(classLoader, interfaces, new ClassLoaderSwitchInvocationHandler(getWatchfulClassLoader(),
                 o));
     }
 
+    /**
+     * Proxy invocation handler which does two things:
+     * <ul>
+     *      <li>wrap calls in class loader which has deployment and external-context classes</li>
+     *      <li>setup proper security context for wrapped call(translate from EAP6 to EAP5)</li>
+     * </ul>
+     * @author baranowb
+     *
+     */
     private class ClassLoaderSwitchInvocationHandler implements InvocationHandler {
 
         private final ClassLoader vengance;
@@ -394,15 +415,53 @@ public class WatchfulContext implements Context {
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            final ClassLoader old = SecurityActions.getContextClassLoader();
+            final ClassLoader oldClassLoader = SecurityActions.getContextClassLoader();
+            final SecurityContext oldContext = SecurityContextAssociation.getSecurityContext();
             try {
                 SecurityActions.setContextClassLoader(this.vengance);
+                final SecurityContext contextHack = createLocalContext();
+                SecurityContextAssociation.setSecurityContext(contextHack);
                 return method.invoke(this.originalTarget, args);
             } finally {
-                SecurityActions.setContextClassLoader(old);
+                try {
+                    SecurityActions.setContextClassLoader(oldClassLoader);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                if (oldContext != null) {
+                    try {
+                        SecurityContextAssociation.setSecurityContext(oldContext);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
             }
 
         }
 
+        /**
+         * Creates 'fake' security context. This method must be executed in proper CL, in order for CTX factory to work
+         * properly.
+         * 
+         * @return
+         * @throws Exception
+         */
+        private JBossSecurityContext createLocalContext() throws Exception {
+            final JBossSecurityContextProxy contextProxy = SecurityUtil.wrapCurrentContext();
+            if (contextProxy == null || contextProxy.getSubjectInfo().getAuthenticatedSubject() == null) {
+                return null;
+            }
+            final JBossSecurityContext newContext = (JBossSecurityContext) SecurityContextFactory
+                    .createSecurityContext(contextProxy.getSecurityDomain());
+            // ugly, but thats how its done
+            final SubjectInfoProxy subjectInfoProxy = contextProxy.getSubjectInfo();
+            final Set<CredentialIdentityProxy> identities = subjectInfoProxy.getIdentities();
+            CredentialIdentityProxy identityProxy = identities.iterator().next();
+            // TODO: this may be require Subject.principials hack
+            newContext.getUtil().createSubjectInfo(identityProxy.asPrincipal(), identityProxy.getCredential(),
+                    subjectInfoProxy.getAuthenticatedSubject());
+            return newContext;
+        }
     }
 }

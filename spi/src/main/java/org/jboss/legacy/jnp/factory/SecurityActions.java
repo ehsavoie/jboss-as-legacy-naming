@@ -24,40 +24,12 @@ package org.jboss.legacy.jnp.factory;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
-
-//import org.jboss.as.security.SecurityMessages;
-//import org.jboss.modules.Module;
-//import org.jboss.modules.ModuleClassLoader;
-//import org.jboss.modules.ModuleIdentifier;
-//import org.jboss.modules.ModuleLoadException;
-//import org.jboss.modules.ModuleLoader;
 
 /**
  * @author baranowb
  * 
  */
 public class SecurityActions {
-//    public static ModuleClassLoader moduleClassLoader(final String moduleName) throws ModuleLoadException {
-//        if (System.getSecurityManager() != null) {
-//            try {
-//                return AccessController.doPrivileged(new PrivilegedExceptionAction<ModuleClassLoader>() {
-//                    public ModuleClassLoader run() throws ModuleLoadException {
-//                        ModuleLoader loader = Module.getCallerModuleLoader();
-//                        ModuleIdentifier identifier = ModuleIdentifier.create(moduleName, "main");
-//                        return loader.loadModule(identifier).getClassLoader();
-//                    }
-//                });
-//            } catch (PrivilegedActionException pae) {
-//                throw SecurityMessages.MESSAGES.moduleLoadException(pae);
-//            }
-//        } else {
-//            ModuleLoader loader = Module.getCallerModuleLoader();
-//            ModuleIdentifier identifier = ModuleIdentifier.create(moduleName, "main");
-//            return loader.loadModule(identifier).getClassLoader();
-//        }
-//    }
 
     /**
      * Gets context classloader.

@@ -31,25 +31,8 @@ import javax.naming.spi.InitialContextFactory;
 import org.jnp.interfaces.NamingContextFactory;
 
 /**
- * InitialContext factory which should be used to external-context in AS configuration. Internally it relies on JNP context
- * factory. Example configuration of AS7+
- * 
- * <pre>
- * &lt;subsystem xmlns="urn:jboss:domain:naming:1.4"&gt;
- *     &lt;bindings&gt;
- *         ...
- *         &lt;external-context name="java:global/client-context" module="org.jboss.legacy.naming.eap5" class="javax.naming.InitialContext"&gt;
- *             &lt;environment&gt;
- *                 &lt;property name="java.naming.provider.url" value="jnp://localhost:1199"/&gt;
- *                 &lt;property name="java.naming.factory.url.pkgs" value="org.jnp.interfaces"/&gt;
- *                 &lt;property name="java.naming.factory.initial" value="org.jboss.legacy.jnp.factory.WatchfulContextFactory"/&gt;
- *             &lt;/environment&gt;
- *         &lt;/external-context&gt;
- *         ...
- *     &lt;/bindings&gt;
- *     ...
- * &lt;/subsystem&gt;
- * </pre>
+ * InitialContext factory which should be used to configure external-context in AS configuration. Internally it relies on JNP context
+ * factory. 
  * 
  * @author baranowb
  * 
