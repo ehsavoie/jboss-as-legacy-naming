@@ -83,7 +83,7 @@ It is possible to enable backward calls from EAP6 to EAP5. In order to do so:
 ## External context configuration:
     <subsystem xmlns="urn:jboss:domain:naming:1.4">
         <bindings>
-            <external-context name="java:global/client-context" module="org.jboss.legacy.naming.eap5" class="javax.naming.InitialContext">
+            <external-context name="java:global/client-context" module="org.jboss.legacy.naming.spi" class="javax.naming.InitialContext">
                 <environment>
                     <property name="java.naming.provider.url" value="jnp://localhost:5599"/>
                     <property name="java.naming.factory.url.pkgs" value="org.jnp.interfaces"/>
