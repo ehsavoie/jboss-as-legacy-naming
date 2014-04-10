@@ -21,9 +21,9 @@
  */
 package org.jboss.legacy.jnp.connector.simple;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.jboss.as.network.SocketBinding;
+import org.jboss.legacy.jnp.JNPLogger;
+import org.jboss.legacy.jnp.JNPMessages;
 import org.jboss.legacy.jnp.connector.JNPServerNamingConnectorService;
 import org.jboss.legacy.jnp.server.JNPServer;
 import org.jboss.msc.service.StartContext;
@@ -66,24 +66,31 @@ public class SingleConnectorService implements JNPServerNamingConnectorService<S
     @Override
     public void start(StartContext startContext) throws StartException {
         try {
+            final SocketBinding socketBinding = this.getBinding().getValue();
+            SocketBinding rmiSocketBinding = socketBinding;
             if (this.getRmiBinding().getOptionalValue() != null) {
-                this.serverConnector = new SingleConnectorLegacyService(jnpServer.getValue(), this.getBinding().getValue().getAddress().getHostName(), this.getBinding().getValue().getAbsolutePort(),
-                        this.getRmiBinding().getValue().getAddress().getHostName(), this.getRmiBinding().getValue().getAbsolutePort());
+                rmiSocketBinding = this.getRmiBinding().getOptionalValue();
+                this.serverConnector = new SingleConnectorLegacyService(jnpServer.getValue(), socketBinding.getAddress().getHostName(), socketBinding.getAbsolutePort(),
+                        rmiSocketBinding.getAddress().getHostName(), rmiSocketBinding.getAbsolutePort());
             } else {
-                this.serverConnector = new SingleConnectorLegacyService(jnpServer.getValue(), this.getBinding().getValue().getAddress().getHostName(), this.getBinding().getValue().getAbsolutePort());
+                this.serverConnector = new SingleConnectorLegacyService(jnpServer.getValue(), socketBinding.getAddress().getHostName(), socketBinding.getAbsolutePort());
             }
+            JNPLogger.ROOT_LOGGER.startSingletonConnectorService(socketBinding.getName(), socketBinding.getAddress(), socketBinding.getAbsolutePort(), 
+                    rmiSocketBinding.getName(), rmiSocketBinding.getAddress(), rmiSocketBinding.getAbsolutePort());
+
             this.serverConnector.start();
         } catch (Exception e) {
-            throw new StartException(e);
+            throw JNPMessages.MESSAGES.failedToStartSingletonConnectorService(e);
         }
     }
 
     @Override
     public void stop(StopContext stopContext) {
+        JNPLogger.ROOT_LOGGER.stopSingletonConnectorService();
         try {
             this.serverConnector.stop();
         } catch (Exception ex) {
-            Logger.getLogger(SingleConnectorService.class.getName()).log(Level.SEVERE, null, ex);
+            JNPLogger.ROOT_LOGGER.couldNotStopSingletonConnectorService(ex);
         }
         this.serverConnector = null;
     }
