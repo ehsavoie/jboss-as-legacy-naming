@@ -31,14 +31,6 @@ import org.jboss.security.plugins.JBossSecurityContext;
  */
 public class SecurityUtil {
 
-    public static void test(){
-        Object o = SecurityContextAssociation.getSecurityContext();
-        System.err.println(" >["+o+"]< ");
-        if(o != null){
-            System.err.println(" >["+o.getClass().getClassLoader()+"]< ");
-            System.err.println(" >["+((JBossSecurityContext)o)+"]< ");
-        }
-    }
     public static JBossSecurityContextProxy wrapCurrentContext(){
         final JBossSecurityContext current = (JBossSecurityContext) SecurityContextAssociation.getSecurityContext();
         if(current == null){
