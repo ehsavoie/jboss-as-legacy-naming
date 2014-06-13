@@ -58,13 +58,12 @@ import org.jboss.security.plugins.JBossSecurityContext;
  */
 public class WatchfulContext implements Context {
 
-    private volatile ClassLoader classLoader;
-    // private String name;
     private final Context wrappedContext;
-
+    private final ClassLoader moduleClassLoader;
     public WatchfulContext(Context wrappedContext) throws NamingException {
         super();
         this.wrappedContext = wrappedContext;
+        this.moduleClassLoader = this.getClass().getClassLoader();
     }
 
     public Object lookup(Name name) throws NamingException {
@@ -367,23 +366,9 @@ public class WatchfulContext implements Context {
     }
 
     protected ClassLoader getWatchfulClassLoader() {
-
-        ClassLoader result = this.classLoader;
-        if (result == null) {
-            synchronized (this) {
-                result = this.classLoader;
-                if (result != null)
-                    return result;
-
-                // use module?
-                final ClassLoader eap5EnabledClassLoader = this.getClass().getClassLoader();
-                // deployment/invocation class loader, to load interface for Proxy
-                final ClassLoader invocationClassLoader = SecurityActions.getContextClassLoader();
-                this.classLoader = result = new WatchfulClassLoader(eap5EnabledClassLoader, invocationClassLoader);
-            }
-        }
-
-        return result;
+        // deployment/invocation class loader, to load interface for Proxy
+        final ClassLoader invocationClassLoader = SecurityActions.getContextClassLoader();
+        return new WatchfulClassLoader(this.moduleClassLoader, invocationClassLoader);
     }
 
     protected Object decorate(Object o, ClassLoader classLoader) {
