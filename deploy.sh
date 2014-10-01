@@ -1,4 +1,4 @@
-#!/bin/sh
+﻿#!/bin/sh
 
 mvn clean install  -s config/settings.xml -Dcheckstyle.skip=true
 
@@ -11,6 +11,7 @@ fi
 rm -Rf $JBOSS_HOME/modules/system/layers/base/org/jboss/legacy/
 cp -Rf eap5/target/module/org $JBOSS_HOME/modules/system/layers/base/
 cp -Rf spi/target/module/org $JBOSS_HOME/modules/system/layers/base/
+cp -Rf spi-server/target/module/org $JBOSS_HOME/modules/system/layers/base/
 cp -Rf jnp/target/module/org $JBOSS_HOME/modules/system/layers/base/
 
 echo "Edit configuration file - for instance $JBOSS_HOME/standalone/configuration/standalone.xml"
