@@ -74,10 +74,14 @@ public class NamingStoreWrapper implements Naming {
         try {
             return lookupInternal(name);
         } catch (Exception t) {
-           if(hasExportedPrefix(name)) {
+            if(hasExportedPrefix(name)) {
                 return lookupInternal(stripJBossExportedContext(name));
-            } 
-            return lookupInternal(parser.parse("java:jboss/exported/" + name.toString()));
+            }
+            try {
+                return lookupInternal(parser.parse("jboss/exported/" + name.toString()));
+            } catch (Exception e) {
+                return lookupInternal(parser.parse("java:jboss/exported/" + name.toString()));
+            }
         }
     }
 
