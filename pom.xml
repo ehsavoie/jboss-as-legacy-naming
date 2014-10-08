@@ -59,7 +59,7 @@
             <dependency>
                 <groupId>org.jboss.as</groupId>
                 <artifactId>jboss-as-parent</artifactId>
-                <version>7.3.1.Final-redhat-2</version>
+                <version>7.4.1.Final-redhat-3</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

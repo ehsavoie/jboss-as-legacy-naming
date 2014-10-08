@@ -81,12 +81,15 @@ public class NamingStoreWrapperTest {
     @Test
     public void testLookupSimple() throws Exception {
         Name completeName = new CompositeName("java:jboss/exported/cn=PUT_TEST.LOAD.TOPIC");
-        Name simpleName = new CompositeName("cn=PUT_TEST.LOAD.TOPIC");   
+        Name exportedName = new CompositeName("jboss/exported/cn=PUT_TEST.LOAD.TOPIC");
+        Name simpleName = new CompositeName("cn=PUT_TEST.LOAD.TOPIC");
         NamingStore eap6Store = Mockito.mock(NamingStore.class);
-        Mockito.when(eap6Store.lookup(simpleName)).thenThrow(new NameNotFoundException());
-        Mockito.when(eap6Store.lookup(completeName)).thenReturn("failure");
+        Mockito.when(eap6Store.lookup(argThat(new NameMatcher(simpleName)))).thenThrow(new NameNotFoundException());
+        Mockito.when(eap6Store.lookup(argThat(new NameMatcher(exportedName)))).thenThrow(new NameNotFoundException());
+        Mockito.when(eap6Store.lookup(argThat(new NameMatcher(completeName)))).thenReturn("failure");
         Naming eap5Server = Mockito.mock(Naming.class);
-        Mockito.when(eap5Server.lookup(simpleName)).thenThrow(new NameNotFoundException());
+        Mockito.when(eap5Server.lookup(argThat(new NameMatcher(simpleName)))).thenThrow(new NameNotFoundException());
+        Mockito.when(eap5Server.lookup(argThat(new NameMatcher(exportedName)))).thenThrow(new NameNotFoundException());
         Mockito.when(eap5Server.lookup(argThat(new NameMatcher(completeName)))).thenReturn("success");
         NamingStoreWrapper instance = new NamingStoreWrapper(eap6Store, eap5Server);
         assertThat(instance.lookup(simpleName).toString(), is("success"));
@@ -99,9 +102,11 @@ public class NamingStoreWrapperTest {
         }
         
         @Override
-	   public boolean matches(Object currentName) {
-	       return name.toString().equals(currentName.toString());
-	   }
+	public boolean matches(Object currentName) {
+            if (currentName != null) {
+                return name.toString().equals(currentName.toString());
+            }
+            return false;
 	}
-
+    }
 }
