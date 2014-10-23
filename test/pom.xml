@@ -211,13 +211,19 @@
         <surefire.forked.process.timeout>1500</surefire.forked.process.timeout>
 
         <jbossas.eap6.zip><!-- To be defined --></jbossas.eap6.zip>
-        <hornetq.version>2.2.13.Final</hornetq.version>
+        <hornetq.version>2.3.21.Final-redhat-1</hornetq.version>
         <version.org.jboss.naming>5.0.3.GA_CP02</version.org.jboss.naming>
         <version.org.jboss.remote-naming>1.0.7.Final-redhat-1</version.org.jboss.remote-naming>
     </properties>
 
     <build>
         <plugins>
+            <plugin>
+               <groupId>org.apache.felix</groupId>
+               <artifactId>maven-bundle-plugin</artifactId>
+               <inherited>true</inherited>
+               <extensions>true</extensions>
+           </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.1</version>
@@ -264,35 +270,35 @@
                                     <else>
                                         <echo message="Unpacking target runtimes." />
                                         <unzip src="${jbossas.eap6.zip}" dest="target/runtime" />
-                                        <unzip src="${project.basedir}/../legacy-jnp-extension-${project.version}.zip" dest="target/runtime/jboss-eap-6.2" />
-                                        <chmod dir="target/runtime/jboss-eap-6.2" perm="ugo+rx" includes="**/*.sh" />
+                                        <unzip src="${project.basedir}/../legacy-jnp-extension-${project.version}.zip" dest="target/runtime/jboss-eap-6.3" />
+                                        <chmod dir="target/runtime/jboss-eap-6.3" perm="ugo+rx" includes="**/*.sh" />
 
                                         <echo message="Enabling JNP for EAP6." />
-                                        <xslt destdir="target/runtime/jboss-eap-6.2/standalone/configuration" style="src/test/resources/xslt/enableJNP.xsl" extension="-jnp.xml.mod" useImplicitFileset="false">
-                                            <fileset dir="target/runtime/jboss-eap-6.2/standalone/configuration">
+                                        <xslt destdir="target/runtime/jboss-eap-6.3/standalone/configuration" style="src/test/resources/xslt/enableJNP.xsl" extension="-jnp.xml.mod" useImplicitFileset="false">
+                                            <fileset dir="target/runtime/jboss-eap-6.3/standalone/configuration">
                                                 <include name="**/standalone-full.xml" />
                                             </fileset>
                                         </xslt>
-                                        <xslt destdir="target/runtime/jboss-eap-6.2/standalone/configuration" style="src/test/resources/xslt/enableHAJNP-backup.xsl" extension="-jnp-backup.xml.mod" useImplicitFileset="false">
-                                            <fileset dir="target/runtime/jboss-eap-6.2/standalone/configuration">
+                                        <xslt destdir="target/runtime/jboss-eap-6.3/standalone/configuration" style="src/test/resources/xslt/enableHAJNP-backup.xsl" extension="-jnp-backup.xml.mod" useImplicitFileset="false">
+                                            <fileset dir="target/runtime/jboss-eap-6.3/standalone/configuration">
                                                 <include name="**/standalone-full-ha.xml" />
                                             </fileset>
                                         </xslt>
-                                        <xslt destdir="target/runtime/jboss-eap-6.2/standalone/configuration" style="src/test/resources/xslt/enableHAJNP.xsl" extension="-jnp.xml.mod" useImplicitFileset="false">
-                                            <fileset dir="target/runtime/jboss-eap-6.2/standalone/configuration">
+                                        <xslt destdir="target/runtime/jboss-eap-6.3/standalone/configuration" style="src/test/resources/xslt/enableHAJNP.xsl" extension="-jnp.xml.mod" useImplicitFileset="false">
+                                            <fileset dir="target/runtime/jboss-eap-6.3/standalone/configuration">
                                                 <include name="**/standalone-full-ha.xml" />
                                             </fileset>
                                         </xslt>
-                                        <move todir="target/runtime/jboss-eap-6.2/standalone/configuration">
-                                            <fileset dir="target/runtime/jboss-eap-6.2/standalone/configuration">
+                                        <move todir="target/runtime/jboss-eap-6.3/standalone/configuration">
+                                            <fileset dir="target/runtime/jboss-eap-6.3/standalone/configuration">
                                                 <include name="**/standalone-full-jnp.xml.mod" />
                                                 <include name="**/standalone-full-ha-jnp.xml.mod" />
                                                 <include name="**/standalone-full-ha-jnp-backup.xml.mod" />
                                             </fileset>
                                             <mapper type="glob" from="*.mod" to="*" />
                                         </move>
-                                        <copy file="src/test/resources/config/application-roles.properties" todir="target/runtime/jboss-eap-6.2/standalone/configuration" overwrite="true" verbose="true" />
-                                        <copy file="src/test/resources/config/application-users.properties" todir="target/runtime/jboss-eap-6.2/standalone/configuration" overwrite="true" verbose="true" />
+                                        <copy file="src/test/resources/config/application-roles.properties" todir="target/runtime/jboss-eap-6.3/standalone/configuration" overwrite="true" verbose="true" />
+                                        <copy file="src/test/resources/config/application-users.properties" todir="target/runtime/jboss-eap-6.3/standalone/configuration" overwrite="true" verbose="true" />
                                     </else>
                                 </if>
                             </target>

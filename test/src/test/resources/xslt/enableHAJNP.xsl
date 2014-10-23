@@ -26,8 +26,8 @@ MA 02110-1301  USA
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
                   xmlns:jnp="urn:jboss:domain:legacy-jnp:1.0"
-                  xmlns:domain="urn:jboss:domain:1.5"
-                  xmlns:logging="urn:jboss:domain:logging:1.3"
+                  xmlns:domain="urn:jboss:domain:1.6"
+                  xmlns:logging="urn:jboss:domain:logging:1.4"
                   xmlns:messaging="urn:jboss:domain:messaging:1.4"
                   exclude-result-prefixes="domain jnp logging messaging">
 

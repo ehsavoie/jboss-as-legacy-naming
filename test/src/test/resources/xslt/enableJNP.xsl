@@ -25,7 +25,7 @@ MA 02110-1301  USA
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
                 xmlns:jnp="urn:jboss:domain:legacy-jnp:1.0"
-                xmlns:domain="urn:jboss:domain:1.5"
+                xmlns:domain="urn:jboss:domain:1.6"
                 exclude-result-prefixes="domain jnp">
     
     <xsl:variable name="nsMessagingInf" select="'urn:jboss:domain:messaging:'"/>
