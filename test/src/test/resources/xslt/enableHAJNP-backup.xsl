@@ -145,22 +145,17 @@ MA 02110-1301  USA
         </xsl:copy>
     </xsl:template>
     
-    <xsl:template match="//messaging:subsystem/messaging:hornetq-server/messaging:jms-connection-factories">
-        <xsl:call-template name="copy" />
-        <xsl:choose>
-            <xsl:when test="//messaging:jms-destinations">
-            </xsl:when>
-            <xsl:otherwise>
-                <jms-destinations>
-                    <jms-queue name="eap6Queue">
-                        <entry name="jms/queue/eap6Queue"/>
-                    </jms-queue>
-                    <jms-queue name="eap6ReplyQueue">
-                        <entry name="jms/queue/eap6ReplyQueue"/>
-                    </jms-queue>
-                </jms-destinations>
-            </xsl:otherwise>
-        </xsl:choose>
+    <xsl:template
+    match="//*[local-name()='subsystem' and starts-with(namespace-uri(), $nsMessagingInf)]/*[local-name()='hornetq-server']/*[local-name()='jms-destinations']">
+        <xsl:copy>
+            <xsl:apply-templates select="node()|@*" />
+            <jms-queue name="eap6Queue">
+                <entry name="jms/queue/eap6Queue" />
+            </jms-queue>
+            <jms-queue name="eap6ReplyQueue">
+                <entry name="jms/queue/eap6ReplyQueue" />
+            </jms-queue>
+        </xsl:copy>
     </xsl:template>
 
 </xsl:stylesheet>
