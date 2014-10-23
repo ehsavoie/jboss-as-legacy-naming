@@ -25,7 +25,7 @@ MA 02110-1301  USA
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
                 xmlns:jnp="urn:jboss:domain:legacy-jnp:1.0"
-                xmlns:domain="urn:jboss:domain:1.5"
+                xmlns:domain="urn:jboss:domain:1.6"
                 exclude-result-prefixes="domain jnp">
     
     <xsl:variable name="nsMessagingInf" select="'urn:jboss:domain:messaging:'"/>
@@ -102,23 +102,17 @@ MA 02110-1301  USA
         </xsl:choose>
     </xsl:template>
 
-     <xsl:template match="//*[local-name()='subsystem' and starts-with(namespace-uri(), $nsMessagingInf)]
-     					  /*[local-name()='hornetq-server']/*[local-name()='jms-connection-factories']">
-        <xsl:call-template name="copy" />
-        <xsl:choose>
-            <xsl:when test="//*[local-name()='jms-destinations']">
-            </xsl:when>
-            <xsl:otherwise>
-                <jms-destinations>
-                    <jms-queue name="eap6Queue">
-                        <entry name="jms/queue/eap6Queue"/>
-                    </jms-queue>
-                    <jms-queue name="eap6ReplyQueue">
-                        <entry name="jms/queue/eap6ReplyQueue"/>
-                    </jms-queue>
-                </jms-destinations>
-            </xsl:otherwise>
-        </xsl:choose>
+     <xsl:template
+    match="//*[local-name()='subsystem' and starts-with(namespace-uri(), $nsMessagingInf)]/*[local-name()='hornetq-server']/*[local-name()='jms-destinations']">
+        <xsl:copy>
+            <xsl:apply-templates select="node()|@*" />
+            <jms-queue name="eap6Queue">
+                <entry name="jms/queue/eap6Queue" />
+            </jms-queue>
+            <jms-queue name="eap6ReplyQueue">
+                <entry name="jms/queue/eap6ReplyQueue" />
+            </jms-queue>
+        </xsl:copy>
     </xsl:template>
 
 </xsl:stylesheet>
