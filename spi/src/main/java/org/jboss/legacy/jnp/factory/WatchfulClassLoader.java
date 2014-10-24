@@ -31,7 +31,7 @@ import sun.misc.CompoundEnumeration;
 /**
  * Simple classloader which allows to merge different class loaders to bridge gap between them if needed.
  * 
- * @wolfc
+ * @author wolfc
  * @author baranowb
  * 
  */
