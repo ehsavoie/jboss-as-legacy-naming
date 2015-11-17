@@ -41,9 +41,14 @@ import org.jboss.arquillian.container.test.api.ContainerController;
 import org.jboss.arquillian.container.test.api.Deployer;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
+import org.jboss.arquillian.container.test.api.TargetsContainer;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
+import org.jboss.as.arquillian.api.ServerSetup;
+import org.jboss.as.arquillian.api.ServerSetupTask;
 import org.jboss.as.arquillian.container.ManagementClient;
+import org.jboss.as.test.integration.common.jms.JMSOperations;
+import org.jboss.as.test.integration.common.jms.JMSOperationsProvider;
 import org.jboss.as.test.shared.TestSuiteEnvironment;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -60,13 +65,17 @@ import org.redhat.jnp.hornetq.mdb.SimpleMDB;
  * @author <a href="mailto:ehugonne@redhat.com">Emmanuel Hugonnet</a> (c) 2014 Red Hat, inc.
  */
 @RunWith(Arquillian.class)
-@RunAsClient
 public class ExportedInvokationTestCase {
 
     private static final Logger log = Logger.getLogger(ExportedInvokationTestCase.class.getName());
 
-    private static final String QUEUE_JNDI_NAME = "java:jboss/exported/jms/queue/eap6Queue";
-    private static final String REPLY_QUEUE_JNDI_NAME = "java:jboss/exported/jms/queue/eap6ReplyQueue";
+    private static final String QUEUE_NAME = "eap6Queue";
+    private static final String EXPORTED_QUEUE_JNDI_NAME = "java:jboss/exported/jms/queue/"+QUEUE_NAME;
+    private static final String REPLY_QUEUE_NAME = "eap6ReplyQueue";
+    private static final String EXPORTED_REPLY_QUEUE_JNDI_NAME = "java:jboss/exported/jms/queue/"+REPLY_QUEUE_NAME;
+    private static final String QUEUE_JNDI_NAME = "jms/queue/"+QUEUE_NAME;
+    private static final String REPLY_QUEUE_JNDI_NAME = "jms/queue/"+REPLY_QUEUE_NAME;
+
     private static final String DEFAULT_CONNECTION_FACTORY = "java:jboss/exported/jms/RemoteConnectionFactory";
     private static final String JNDI_CONFIG = "jndi-eap6.properties";
     private static final String DEPLOYMENT = "ping-pong";
@@ -76,16 +85,20 @@ public class ExportedInvokationTestCase {
     @ArquillianResource
     private static ContainerController containerController;
 
-    ManagementClient managementClient = new ManagementClient(TestSuiteEnvironment.getModelControllerClient(),
+    private ManagementClient managementClient = new ManagementClient(TestSuiteEnvironment.getModelControllerClient(),
             TestSuiteEnvironment.getServerAddress(), TestSuiteEnvironment.getServerPort());
 
+    private JMSOperations jmsAdminOperations = JMSOperationsProvider.getInstance(managementClient);
+    
     @ArquillianResource
-    Deployer deployer;
+    private Deployer deployer;
 
     @Before
     public void initServer() throws Exception {
         containerController.start(SERVER);
         if (containerController.isStarted(SERVER)) {
+            jmsAdminOperations.createJmsQueue(QUEUE_NAME, QUEUE_JNDI_NAME);
+            jmsAdminOperations.createJmsQueue(REPLY_QUEUE_NAME, REPLY_QUEUE_JNDI_NAME);
             deployer.deploy(DEPLOYMENT);
         }
     }
@@ -94,6 +107,9 @@ public class ExportedInvokationTestCase {
     public void closeServer() throws Exception {
         if (containerController.isStarted(SERVER)) {
             deployer.undeploy(DEPLOYMENT);
+            jmsAdminOperations.removeJmsQueue(QUEUE_NAME);
+            jmsAdminOperations.removeJmsQueue(REPLY_QUEUE_NAME);
+            jmsAdminOperations.close();
             containerController.stop(SERVER);
         }
     }
@@ -179,7 +195,7 @@ public class ExportedInvokationTestCase {
     }
 
     private Destination lookupDestination(InitialContext initialContext) throws NamingException {
-        String destinationString = System.getProperty("destination", QUEUE_JNDI_NAME);
+        String destinationString = System.getProperty("destination", EXPORTED_QUEUE_JNDI_NAME);
         log.log(Level.INFO, "Attempting to acquire destination \"{0}\"", destinationString);
         Destination destination = (Destination) initialContext.lookup(destinationString);
         log.log(Level.INFO, "Found destination \"{0}\" in JNDI", destinationString);
@@ -187,7 +203,7 @@ public class ExportedInvokationTestCase {
     }
 
     private Destination lookupReceiver(InitialContext initialContext) throws NamingException {
-        String destinationString = System.getProperty("destination", REPLY_QUEUE_JNDI_NAME);
+        String destinationString = System.getProperty("destination", EXPORTED_REPLY_QUEUE_JNDI_NAME);
         log.log(Level.INFO, "Attempting to acquire destination \"{0}\"", destinationString);
         Destination destination = (Destination) initialContext.lookup(destinationString);
         log.log(Level.INFO, "Found destination \"{0}\" in JNDI", destinationString);

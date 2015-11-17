@@ -41,9 +41,14 @@ import org.jboss.arquillian.container.test.api.ContainerController;
 import org.jboss.arquillian.container.test.api.Deployer;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
+import org.jboss.arquillian.container.test.api.TargetsContainer;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
+import org.jboss.as.arquillian.api.ServerSetup;
+import org.jboss.as.arquillian.api.ServerSetupTask;
 import org.jboss.as.arquillian.container.ManagementClient;
+import org.jboss.as.test.integration.common.jms.JMSOperations;
+import org.jboss.as.test.integration.common.jms.JMSOperationsProvider;
 import org.jboss.as.test.shared.TestSuiteEnvironment;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -58,34 +63,40 @@ import org.redhat.jnp.hornetq.mdb.SimpleMDB;
 /**
  *
  * @author <a href="mailto:ehugonne@redhat.com">Emmanuel Hugonnet</a> (c) 2014 Red Hat, inc.
+ * @author baranowb
  */
 @RunWith(Arquillian.class)
-@RunAsClient
 public class SimpleInvokationTestCase {
 
     private static final Logger log = Logger.getLogger(SimpleInvokationTestCase.class.getName());
 
-    private static final String QUEUE_JNDI_NAME = "jms/queue/eap6Queue";
-    private static final String REPLY_QUEUE_JNDI_NAME = "jms/queue/eap6ReplyQueue";
+    private static final String QUEUE_NAME = "eap6Queue";
+    private static final String QUEUE_JNDI_NAME = "jms/queue/"+QUEUE_NAME;
+    private static final String REPLY_QUEUE_NAME = "eap6ReplyQueue";
+    private static final String REPLY_QUEUE_JNDI_NAME = "jms/queue/"+REPLY_QUEUE_NAME;
     private static final String DEFAULT_CONNECTION_FACTORY = "java:jboss/exported/jms/RemoteConnectionFactory";
     private static final String JNDI_CONFIG = "jndi-eap6.properties";
     private static final String DEPLOYMENT = "ping-pong";
-    
-    public static final String SERVER = "jbossas";
 
+    public static final String SERVER = "jbossas";
+    
     @ArquillianResource
     private static ContainerController containerController;
 
-    ManagementClient managementClient = new ManagementClient(TestSuiteEnvironment.getModelControllerClient(),
+    private ManagementClient managementClient = new ManagementClient(TestSuiteEnvironment.getModelControllerClient(),
             TestSuiteEnvironment.getServerAddress(), TestSuiteEnvironment.getServerPort());
 
+    private JMSOperations jmsAdminOperations = JMSOperationsProvider.getInstance(managementClient);
+
     @ArquillianResource
-    Deployer deployer;
+    private Deployer deployer;
 
     @Before
     public void initServer() throws Exception {
         containerController.start(SERVER);
         if (containerController.isStarted(SERVER)) {
+            jmsAdminOperations.createJmsQueue(QUEUE_NAME, QUEUE_JNDI_NAME);
+            jmsAdminOperations.createJmsQueue(REPLY_QUEUE_NAME, REPLY_QUEUE_JNDI_NAME);
             deployer.deploy(DEPLOYMENT);
         }
     }
@@ -94,18 +105,15 @@ public class SimpleInvokationTestCase {
     public void closeServer() throws Exception {
         if (containerController.isStarted(SERVER)) {
             deployer.undeploy(DEPLOYMENT);
+            jmsAdminOperations.removeJmsQueue(QUEUE_NAME);
+            jmsAdminOperations.removeJmsQueue(REPLY_QUEUE_NAME);
+            jmsAdminOperations.close();
             containerController.stop(SERVER);
         }
     }
-
-    private InitialContext getInitialContext() throws NamingException, IOException {
-        Properties jndiProperties = new Properties();
-        jndiProperties.load(this.getClass().getClassLoader().getResourceAsStream(System.getProperty("jndi_config", JNDI_CONFIG)));
-        return new javax.naming.InitialContext(jndiProperties);
-    }
-
+    
     @Deployment(name = DEPLOYMENT, testable = false, managed = false)
-    public static Archive createDeployment() {
+    public static Archive createDeployment(){
         final JavaArchive jar = ShrinkWrap.create(JavaArchive.class, DEPLOYMENT + ".jar");
         jar.addClasses(SimpleMDB.class);
         return jar;
@@ -192,5 +200,11 @@ public class SimpleInvokationTestCase {
         Destination destination = (Destination) initialContext.lookup(destinationString);
         log.log(Level.INFO, "Found destination \"{0}\" in JNDI", destinationString);
         return destination;
+    }
+
+    private InitialContext getInitialContext() throws NamingException, IOException {
+        Properties jndiProperties = new Properties();
+        jndiProperties.load(this.getClass().getClassLoader().getResourceAsStream(System.getProperty("jndi_config", JNDI_CONFIG)));
+        return new javax.naming.InitialContext(jndiProperties);
     }
 }
