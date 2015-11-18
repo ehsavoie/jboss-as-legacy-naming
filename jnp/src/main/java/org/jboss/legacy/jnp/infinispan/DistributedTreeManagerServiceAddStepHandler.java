@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.infinispan.Cache;
-import org.jboss.as.clustering.infinispan.subsystem.CacheService;
 import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
@@ -34,6 +33,7 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceTarget;
+import org.wildfly.clustering.infinispan.spi.service.CacheServiceName;
 
 /**
  * 
@@ -61,7 +61,7 @@ public class DistributedTreeManagerServiceAddStepHandler extends AbstractBoottim
         final DistributedTreeManagerService service = new DistributedTreeManagerService();
         final ServiceTarget serviceTarget = context.getServiceTarget();
         final ServiceBuilder<InfinispanDistributedTreeManager> serviceBuilder = serviceTarget.addService(DistributedTreeManagerService.SERVICE_NAME, service);
-        serviceBuilder.addDependency(CacheService.getServiceName(containerRef, cacheRef), Cache.class, service.getCache());
+        serviceBuilder.addDependency(CacheServiceName.CACHE.getServiceName(containerRef, cacheRef), Cache.class, service.getCache());
         final ServiceController<InfinispanDistributedTreeManager> distributedTreeManagerController = serviceBuilder.install();
         final List<ServiceController<?>> installedServices = new ArrayList<ServiceController<?>>();
         installedServices.add(distributedTreeManagerController);

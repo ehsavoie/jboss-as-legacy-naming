@@ -24,7 +24,6 @@ package org.jboss.legacy.jnp.connector;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.jboss.as.clustering.impl.CoreGroupCommunicationService;
 
 import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
 import org.jboss.as.controller.OperationContext;
@@ -70,12 +69,14 @@ public class JNPServerConnectorServiceAddStepHandler extends AbstractBoottimeAdd
         final ServiceBuilder<JNPServerNamingConnectorService<?>> serviceBuilder;
         final JNPServerNamingConnectorService service;
         if (containerRef.isDefined()) {
-            service = new HAConnectorService();
-            final HAConnectorService haConnectorService = (HAConnectorService) service;
-            serviceBuilder = serviceTarget.addService(JNPServerNamingConnectorService.SERVICE_NAME, service);
-            serviceBuilder.addDependency(CoreGroupCommunicationService.getServiceName(containerRef.asString()), CoreGroupCommunicationService.class, haConnectorService.getCoreGroupCommunicationService())
-                    .addDependency(DistributedTreeManagerService.SERVICE_NAME, InfinispanDistributedTreeManager.class, haConnectorService.getDistributedTreeManager())
-                    .addDependency(ContextNames.JAVA_CONTEXT_SERVICE_NAME, ServiceBasedNamingStore.class, haConnectorService.getNamingStoreValue());
+            //TODO: XXX
+            throw new OperationFailedException("No clustering ATM.");
+//            service = new HAConnectorService();
+//            final HAConnectorService haConnectorService = (HAConnectorService) service;
+//            serviceBuilder = serviceTarget.addService(JNPServerNamingConnectorService.SERVICE_NAME, service);
+//            serviceBuilder.addDependency(CoreGroupCommunicationService.getServiceName(containerRef.asString()), CoreGroupCommunicationService.class, haConnectorService.getCoreGroupCommunicationService())
+//                    .addDependency(DistributedTreeManagerService.SERVICE_NAME, InfinispanDistributedTreeManager.class, haConnectorService.getDistributedTreeManager())
+//                    .addDependency(ContextNames.JAVA_CONTEXT_SERVICE_NAME, ServiceBasedNamingStore.class, haConnectorService.getNamingStoreValue());
         } else {
             service = new SingleConnectorService();
             serviceBuilder = serviceTarget.addService(JNPServerNamingConnectorService.SERVICE_NAME, service);

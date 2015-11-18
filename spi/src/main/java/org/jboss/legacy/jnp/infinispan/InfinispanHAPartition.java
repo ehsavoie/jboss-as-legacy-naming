@@ -119,7 +119,8 @@ public class InfinispanHAPartition implements HAPartition {
 
     @Override
     public void unsubscribeFromStateTransferEvents(String serviceName, HAPartitionStateTransfer subscriber) {
-        service.unregisterStateTransferProvider(serviceName);
+        //TODO: XXX
+        //service.unregisterStateTransferProvider(serviceName);
     }
 
     @Override

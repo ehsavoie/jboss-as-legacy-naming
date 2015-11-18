@@ -21,22 +21,23 @@
  */
 package org.jboss.legacy.jnp.infinispan;
 
-import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
-import org.jboss.as.clustering.ClusterNode;
+import org.wildfly.clustering.group.Node;
 import org.jgroups.stack.IpAddress;
-
+import org.jboss.legacy.jnp.infinispan.ClusterNodeProxy;
 /**
  *
  * @author <a href="mailto:ehugonne@redhat.com">Emmanuel Hugonnet</a> (c) 2013 Red Hat, inc.
  */
-public class ClusterNodeAdapter implements ClusterNode {
+public class ClusterNodeAdapter implements Node {
 
     private final ClusterNodeProxy node;
-
+    
     public ClusterNodeAdapter(ClusterNodeProxy node) {
         this.node = node;
+        
     }
 
     @Override
@@ -45,37 +46,31 @@ public class ClusterNodeAdapter implements ClusterNode {
     }
 
     @Override
-    public InetAddress getIpAddress() {
-        return node.getIpAddress();
+    public InetSocketAddress getSocketAddress() {
+        return this.node.getAddress();
     }
 
-    @Override
-    public int getPort() {
-        return node.getPort();
-    }
-
-    @Override
-    public int compareTo(ClusterNode o) {
+    public int compareTo(Node o) {
         return getId(this).compareTo(getId(o));
     }
     
 
-    private String getId(ClusterNode node) {
-        IpAddress address = new IpAddress(node.getIpAddress(), node.getPort());
+    private String getId(Node node) {
+        IpAddress address = new IpAddress(node.getSocketAddress().getAddress(), node.getSocketAddress().getPort());
         return address.getIpAddress().getHostAddress() + ":" + address.getPort();
     }
     
-    public static List<ClusterNodeProxy> convertToList(List<ClusterNode> nodes) {
+    public static List<ClusterNodeProxy> convertToList(List<Node> nodes) {
         List<ClusterNodeProxy> result = new ArrayList<ClusterNodeProxy>(nodes.size());
-        for(ClusterNode node : nodes) {
-            result.add(new ClusterNodeProxy(node.getIpAddress(), node.getName(), node.getPort()));
+        for(Node node : nodes) {
+            result.add(new ClusterNodeProxy(node.getSocketAddress().getAddress(), node.getName(), node.getSocketAddress().getPort()));
         }
         return result;
     }
     
-    public static List<List<ClusterNodeProxy>> convertListOfList(List<List<ClusterNode>> nodes) {
+    public static List<List<ClusterNodeProxy>> convertListOfList(List<List<Node>> nodes) {
         List<List<ClusterNodeProxy>> result = new ArrayList<List<ClusterNodeProxy>>(nodes.size());
-        for(List<ClusterNode> list : nodes) {
+        for(List<Node> list : nodes) {
             result.add(convertToList(list));
         }
         return result;

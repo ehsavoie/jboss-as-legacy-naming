@@ -53,8 +53,8 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-clustering-impl</artifactId>
+            <groupId>org.jboss.eap</groupId>
+    		<artifactId>wildfly-clustering-server</artifactId>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
@@ -66,8 +66,8 @@
         <!-- work-around for transitive dependency of org.jboss.jbossas:jboss-as-cluster -->
         <!-- work-around for transitive dependency of org.jboss.jbossas:jboss-as-cluster -->
         <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-naming</artifactId>
+            <groupId>org.jboss.eap</groupId>
+    		<artifactId>wildfly-naming</artifactId>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>

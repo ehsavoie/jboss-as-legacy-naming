@@ -46,12 +46,12 @@ public class LegacyClusterNodeAdapter implements ClusterNode {
 
     @Override
     public InetAddress getIpAddress() {
-        return node.getIpAddress();
+        return node.getAddress().getAddress();
     }
 
     @Override
     public int getPort() {
-        return node.getPort();
+        return node.getAddress().getPort();
     }
 
     private String getId(ClusterNode node) {

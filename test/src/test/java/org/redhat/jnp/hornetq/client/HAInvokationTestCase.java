@@ -69,6 +69,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.redhat.jnp.hornetq.mdb.SimpleMDB;
 
@@ -78,6 +79,7 @@ import org.redhat.jnp.hornetq.mdb.SimpleMDB;
  */
 @RunWith(Arquillian.class)
 @RunAsClient
+@Ignore("HA not supported.")
 public class HAInvokationTestCase {
 
     private static final Logger log = Logger.getLogger(HAInvokationTestCase.class.getName());

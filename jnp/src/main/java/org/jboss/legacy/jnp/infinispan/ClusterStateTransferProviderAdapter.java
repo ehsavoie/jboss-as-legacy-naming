@@ -22,20 +22,19 @@
 package org.jboss.legacy.jnp.infinispan;
 
 import java.io.Serializable;
-import org.jboss.as.clustering.StateTransferProvider;
+//import org.jboss.as.clustering.StateTransferProvider;
 
 /**
  *
  * @author <a href="mailto:ehugonne@redhat.com">Emmanuel Hugonnet</a> (c) 2013 Red Hat, inc.
  */
-public class ClusterStateTransferProviderAdapter implements StateTransferProvider {
-    
+public class ClusterStateTransferProviderAdapter /*implements StateTransferProvider*/ {
+    //TODO: XXX
     private final ClusterStateTransferProvider provider;
     public ClusterStateTransferProviderAdapter(ClusterStateTransferProvider provider) {
         this.provider = provider;
     }
 
-    @Override
     public Serializable getCurrentState() {
         return provider.getCurrentState();
     }

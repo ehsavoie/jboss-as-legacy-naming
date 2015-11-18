@@ -84,7 +84,7 @@ public class SimpleInvokationTestCase {
     private static ContainerController containerController;
 
     private ManagementClient managementClient = new ManagementClient(TestSuiteEnvironment.getModelControllerClient(),
-            TestSuiteEnvironment.getServerAddress(), TestSuiteEnvironment.getServerPort());
+            TestSuiteEnvironment.getServerAddress(), TestSuiteEnvironment.getServerPort(), "http-remoting");
 
     private JMSOperations jmsAdminOperations = JMSOperationsProvider.getInstance(managementClient);
 
@@ -113,7 +113,8 @@ public class SimpleInvokationTestCase {
     }
     
     @Deployment(name = DEPLOYMENT, testable = false, managed = false)
-    public static Archive createDeployment(){
+
+    public static Archive<JavaArchive> createDeployment() {
         final JavaArchive jar = ShrinkWrap.create(JavaArchive.class, DEPLOYMENT + ".jar");
         jar.addClasses(SimpleMDB.class);
         return jar;

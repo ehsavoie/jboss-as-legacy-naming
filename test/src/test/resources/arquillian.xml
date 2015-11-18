@@ -28,37 +28,37 @@ MA 02110-1301  USA
     <group qualifier="ha-jnp">
         <container qualifier="jbossas" default="true" mode="manual">
             <configuration>
-                <property name="jbossHome">target/runtime/jboss-eap-6.3</property>
-                <property name="javaVmArguments">${server.jvm.args} -Djboss.inst=${basedir}/target/runtime/jboss-eap-6.3 -Dtest.bind.address=${node0}</property>
+                <property name="jbossHome">target/runtime/jboss-eap</property>
+                <property name="javaVmArguments">${server.jvm.args} -Djboss.inst=${basedir}/target/runtime/jboss-eap -Dtest.bind.address=${node0}</property>
                 <property name="serverConfig">${jboss.server.config.file.name:standalone-full-jnp.xml}</property>
                 <property name="allowConnectingToRunningServer">true</property>
                 <property name="managementAddress">${node0:127.0.0.1}</property>
-                <property name="managementPort">${as.managementPort:9999}</property>
+                <property name="managementPort">${as.managementPort:9990}</property>
                 <property name="waitForPorts">${as.debug.port:8787} ${as.managementPort:9999}</property>
                 <property name="waitForPortsTimeoutInSeconds">8</property>
             </configuration>
         </container>    
         <container qualifier="jbossas-ha-node1" default="false" mode="manual">
             <configuration>
-                <property name="jbossHome">target/runtime/jboss-eap-6.3</property>
-                <property name="javaVmArguments">${server.jvm.args} -Djboss.home.dir=${basedir}/target/runtime/jboss-eap-6.3 -Djboss.inst=${basedir}/target/runtime/jboss-eap-6.3 -Djboss.node.name=jbossas-ha-node1 -Dtest.bind.address=${node1} -Djboss.default.multicast.address=${mcast}</property>
+                <property name="jbossHome">target/runtime/jboss-eap</property>
+                <property name="javaVmArguments">${server.jvm.args} -Djboss.home.dir=${basedir}/target/runtime/jboss-eap -Djboss.inst=${basedir}/target/runtime/jboss-eap -Djboss.node.name=jbossas-ha-node1 -Dtest.bind.address=${node1} -Djboss.default.multicast.address=${mcast}</property>
                 <property name="serverConfig">standalone-full-ha-jnp.xml</property>
                 <property name="allowConnectingToRunningServer">true</property>
                 <property name="managementAddress">${node1:127.0.0.1}</property>
-                <property name="managementPort">${as.managementPort:9999}</property>
-                <property name="waitForPorts">${as.managementPort:9999}</property>
+                <property name="managementPort">${as.managementPort:9990}</property>
+                <property name="waitForPorts">${as.managementPort:9990}</property>
                 <property name="waitForPortsTimeoutInSeconds">8</property>
             </configuration>
         </container>    
         <container qualifier="jbossas-ha-node2" default="false" mode="manual">
             <configuration>
-                <property name="jbossHome">target/runtime/jboss-eap-6.3</property>
-                <property name="javaVmArguments">${server.jvm.args} -Djboss.home.dir=${basedir}/target/runtime/jboss-eap-6.3 -Djboss.inst=${basedir}/target/runtime/jboss-eap-6.3 -Djboss.node.name=jbossas-ha-node2 -Djboss.socket.binding.port-offset=500 -Dtest.bind.address=${node2} -Djboss.default.multicast.address=${mcast}</property>
+                <property name="jbossHome">target/runtime/jboss-eap</property>
+                <property name="javaVmArguments">${server.jvm.args} -Djboss.home.dir=${basedir}/target/runtime/jboss-eap -Djboss.inst=${basedir}/target/runtime/jboss-eap -Djboss.node.name=jbossas-ha-node2 -Djboss.socket.binding.port-offset=500 -Dtest.bind.address=${node2} -Djboss.default.multicast.address=${mcast}</property>
                 <property name="serverConfig">standalone-full-ha-jnp-backup.xml</property>
                 <property name="allowConnectingToRunningServer">true</property>
                 <property name="managementAddress">${node2:127.0.0.1}</property>
                 <property name="managementPort">${as.managementPort:10499}</property>
-                <property name="waitForPorts">${as.managementPort:10499}</property>
+                <property name="waitForPorts">${as.managementPort:10490}</property>
                 <property name="waitForPortsTimeoutInSeconds">8</property>
             </configuration>
         </container>

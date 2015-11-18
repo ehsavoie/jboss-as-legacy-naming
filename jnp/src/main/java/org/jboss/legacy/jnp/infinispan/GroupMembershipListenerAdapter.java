@@ -22,14 +22,15 @@
 package org.jboss.legacy.jnp.infinispan;
 
 import java.util.List;
-import org.jboss.as.clustering.ClusterNode;
-import org.jboss.as.clustering.GroupMembershipListener;
-
+import org.wildfly.clustering.group.Group;
+import org.wildfly.clustering.group.Node;
+import org.jboss.legacy.jnp.infinispan.ClusterListener;
 /**
  *
  * @author <a href="mailto:ehugonne@redhat.com">Emmanuel Hugonnet</a> (c) 2013 Red Hat, inc.
+ * @author <a href="mailto:bbaranow@redhat.com">baranowb</a> (c) 2013 Red Hat, inc.
  */
-public class GroupMembershipListenerAdapter implements GroupMembershipListener {
+public class GroupMembershipListenerAdapter implements Group.Listener {
 
     private final ClusterListener listener;
 
@@ -37,15 +38,17 @@ public class GroupMembershipListenerAdapter implements GroupMembershipListener {
         this.listener = listener;
     }
 
+    /* (non-Javadoc)
+     * @see org.wildfly.clustering.group.Group.Listener#membershipChanged(java.util.List, java.util.List, boolean)
+     */
     @Override
-    public void membershipChanged(List<ClusterNode> list, List<ClusterNode> list1, List<ClusterNode> list2) {
-        listener.membershipChanged(ClusterNodeAdapter.convertToList(list), ClusterNodeAdapter.convertToList(list1), ClusterNodeAdapter.convertToList(list2));
-    }
-
-    @Override
-    public void membershipChangedDuringMerge(List<ClusterNode> list, List<ClusterNode> list1, List<ClusterNode> list2, List<List<ClusterNode>> list3) {
-        listener.membershipChangedDuringMerge(ClusterNodeAdapter.convertToList(list),ClusterNodeAdapter.convertToList(list1),
-                ClusterNodeAdapter.convertToList(list2), ClusterNodeAdapter.convertListOfList(list3));
+    public void membershipChanged(List<Node> previousMembers, List<Node> members, boolean merged) {
+        //TODO: XXX
+        if(merged){
+            
+        } else {
+            
+        }
     }
 
 }

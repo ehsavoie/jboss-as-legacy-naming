@@ -23,8 +23,8 @@ package org.jboss.legacy.jnp.connector.clustered;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.jboss.as.clustering.ClusterNode;
-import org.jboss.as.clustering.impl.CoreGroupCommunicationService;
+//import org.jboss.as.clustering.ClusterNode;
+//import org.jboss.as.clustering.impl.CoreGroupCommunicationService;
 import org.jboss.legacy.jnp.infinispan.ClusterListener;
 import org.jboss.legacy.jnp.infinispan.ClusterNodeAdapter;
 import org.jboss.legacy.jnp.infinispan.ClusterNodeProxy;
@@ -42,121 +42,132 @@ import org.jboss.msc.service.ServiceName;
  */
 public class InfinispanGroupCommunicationService implements HAGroupCommunicationService {
 
-    private final CoreGroupCommunicationService service;
+    //TODO: XXX
+    //private final CoreGroupCommunicationService service;
 
-    public InfinispanGroupCommunicationService(CoreGroupCommunicationService service) {
-        this.service = service;
+    public InfinispanGroupCommunicationService(/*CoreGroupCommunicationService service*/) {
+        //this.service = service;
     }
 
     public static ServiceName getServiceName(String name) {
-        return CoreGroupCommunicationService.getServiceName(name);
+        //return CoreGroupCommunicationService.getServiceName(name);
+        return null;
     }
 
     @Override
     public String getNodeName() {
-        return service.getNodeName();
+        //return service.getNodeName();
+        return null;
     }
 
     @Override
     public String getGroupName() {
-        return service.getGroupName();
+        //return service.getGroupName();
+        return null;
     }
 
     @Override
     public List<String> getCurrentView() {
-        return service.getCurrentView();
+        //return service.getCurrentView();
+        return null;
     }
 
     @Override
     public long getCurrentViewId() {
-        return service.getCurrentViewId();
+        //return service.getCurrentViewId();
+        return 1;
     }
 
     @Override
     public List<ClusterNodeProxy> getClusterNodes() {
         List<ClusterNodeProxy> result = new ArrayList<ClusterNodeProxy>();
-        for(ClusterNode node : service.getClusterNodes()) {
-            result.add(new ClusterNodeProxy(node.getIpAddress(), node.getName(), node.getPort()));
-        }
+//        for(ClusterNode node : service.getClusterNodes()) {
+//            result.add(new ClusterNodeProxy(node.getIpAddress(), node.getName(), node.getPort()));
+//        }
         return result;
     }
 
     @Override
     public ClusterNodeProxy getClusterNode() {
-        ClusterNode node = service.getClusterNode();
-        if (node != null) {
-            return new ClusterNodeProxy(node.getIpAddress(), node.getName(), node.getPort());
-        }
+//        ClusterNode node = service.getClusterNode();
+//        if (node != null) {
+//            return new ClusterNodeProxy(node.getIpAddress(), node.getName(), node.getPort());
+//        }
         return null;
     }
 
     @Override
     public void registerRPCHandler(String objName, Object subscriber) {
-        service.registerRPCHandler(objName, subscriber);
+        //service.registerRPCHandler(objName, subscriber);
     }
 
     @Override
     public void unregisterRPCHandler(String objName, Object subscriber) {
-        service.unregisterRPCHandler(objName, subscriber);
+        //service.unregisterRPCHandler(objName, subscriber);
     }
 
     @Override
     public List callMethodOnCluster(String serviceName, String methodName, Object[] args, Class[] types, boolean excludeSelf) throws Exception {
-        return service.callMethodOnCluster(serviceName, methodName, args, types, excludeSelf);
+        //return service.callMethodOnCluster(serviceName, methodName, args, types, excludeSelf);
+        return null;
     }
 
     @Override
     public List callMethodOnCluster(String serviceName, String methodName, Object[] args, Class[] types, boolean excludeSelf, ClusterResponseFilter filter) throws Exception {
-        return service.callMethodOnCluster(serviceName, methodName, args, types, excludeSelf, new ClusterResponseFilterAdapter(filter));
+        //return service.callMethodOnCluster(serviceName, methodName, args, types, excludeSelf, new ClusterResponseFilterAdapter(filter));
+        return null;
     }
 
     @Override
     public Object callMethodOnNode(String serviceName, String methodName, Object[] args, Class[] types, ClusterNodeProxy targetNode) throws Exception {
-        return service.callMethodOnNode(serviceName, methodName, args, types, new ClusterNodeAdapter(targetNode));
+        //return service.callMethodOnNode(serviceName, methodName, args, types, new ClusterNodeAdapter(targetNode));
+        return null;
     }
 
     @Override
     public void callAsyncMethodOnNode(String serviceName, String methodName, Object[] args, Class[] types, ClusterNodeProxy targetNode) throws Exception {
-        service.callAsyncMethodOnNode(serviceName, methodName, args, types, new ClusterNodeAdapter(targetNode));
+        //service.callAsyncMethodOnNode(serviceName, methodName, args, types, new ClusterNodeAdapter(targetNode));
     }
 
     @Override
     public void callAsynchMethodOnCluster(String serviceName, String methodName, Object[] args, Class[] types, boolean excludeSelf) throws Exception {
-        service.callAsynchMethodOnCluster(serviceName, methodName, args, types, excludeSelf);
+        //service.callAsynchMethodOnCluster(serviceName, methodName, args, types, excludeSelf);
     }
 
     @Override
     public boolean getAllowSynchronousMembershipNotifications() {
-        return service.getAllowSynchronousMembershipNotifications();
+        //return service.getAllowSynchronousMembershipNotifications();
+        return false;
     }
 
     @Override
     public void setAllowSynchronousMembershipNotifications(boolean allowSync) {
-        service.setAllowSynchronousMembershipNotifications(allowSync);
+        //service.setAllowSynchronousMembershipNotifications(allowSync);
     }
 
     @Override
     public void registerGroupMembershipListener(ClusterListener listener) {
-        service.registerGroupMembershipListener(new GroupMembershipListenerAdapter(listener));
+        //service.registerGroupMembershipListener(new GroupMembershipListenerAdapter(listener));
     }
 
     @Override
     public void unregisterGroupMembershipListener(ClusterListener listener) {
-        service.unregisterGroupMembershipListener(new GroupMembershipListenerAdapter(listener));
+        //service.unregisterGroupMembershipListener(new GroupMembershipListenerAdapter(listener));
     }
 
     @Override
     public void registerStateTransferProvider(String serviceName, ClusterStateTransferProvider provider) {
-        service.registerStateTransferProvider(serviceName, new ClusterStateTransferProviderAdapter(provider));
+        //service.registerStateTransferProvider(serviceName, new ClusterStateTransferProviderAdapter(provider));
     }
 
     @Override
     public void unregisterStateTransferProvider(String serviceName) {
-        service.unregisterStateTransferProvider(serviceName);
+        //service.unregisterStateTransferProvider(serviceName);
     }
     
     @Override
     public ArrayList callMethodOnCoordinatorNode(String serviceName, String methodName, Object[] args, Class[] types, boolean excludeSelf) throws Exception {
-        return service.callMethodOnCoordinatorNode(serviceName, methodName, args, types, excludeSelf);
+        //return service.callMethodOnCoordinatorNode(serviceName, methodName, args, types, excludeSelf);
+        return null;
     }
 }

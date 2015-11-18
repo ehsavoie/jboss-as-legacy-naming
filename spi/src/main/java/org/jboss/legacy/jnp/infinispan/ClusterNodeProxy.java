@@ -22,6 +22,7 @@
 package org.jboss.legacy.jnp.infinispan;
 
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 
 /**
  *
@@ -29,26 +30,19 @@ import java.net.InetAddress;
  */
 public class ClusterNodeProxy {
 
-    private final InetAddress ipAddress;
     private final String name;
-    private final int port;
+    private final InetSocketAddress inetSocketAddress;
 
     public ClusterNodeProxy(InetAddress ipAddress, String name, int port) {
-        this.ipAddress = ipAddress;
         this.name = name;
-        this.port = port;
+        this.inetSocketAddress = new InetSocketAddress(ipAddress, port);
     }
 
     public String getName() {
         return name;
     }
 
-    public InetAddress getIpAddress() {
-        return ipAddress;
+    public InetSocketAddress getAddress(){
+        return this.inetSocketAddress;
     }
-
-    public int getPort() {
-        return port;
-    }
-
 }

@@ -86,7 +86,8 @@ public class ExportedInvokationTestCase {
     private static ContainerController containerController;
 
     private ManagementClient managementClient = new ManagementClient(TestSuiteEnvironment.getModelControllerClient(),
-            TestSuiteEnvironment.getServerAddress(), TestSuiteEnvironment.getServerPort());
+            TestSuiteEnvironment.getServerAddress(), TestSuiteEnvironment.getServerPort(),"http-remoting");
+
 
     private JMSOperations jmsAdminOperations = JMSOperationsProvider.getInstance(managementClient);
     

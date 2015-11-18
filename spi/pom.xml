@@ -152,13 +152,13 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-controller</artifactId>
+            <groupId>org.wildfly.core</groupId>
+    		<artifactId>wildfly-controller</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-security</artifactId>
+            <groupId>org.jboss.eap</groupId>
+    		<artifactId>wildfly-security</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

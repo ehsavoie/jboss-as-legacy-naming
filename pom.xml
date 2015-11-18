@@ -23,9 +23,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>jboss-parent</artifactId>
         <groupId>org.jboss</groupId>
-        <version>11-redhat-1</version>
+      	<artifactId>jboss-parent</artifactId>
+      	<version>19</version>
         <relativePath />
     </parent>
     <groupId>org.jboss.as.legacy</groupId>
@@ -57,9 +57,9 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.jboss.as</groupId>
-                <artifactId>jboss-as-parent</artifactId>
-                <version>7.4.2.Final-redhat-1</version>
+                <groupId>org.jboss.eap</groupId>
+    			<artifactId>jboss-eap-parent</artifactId>
+    			<version>7.0.0.ER4-redhat-1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -188,7 +188,7 @@
             <id>ci</id>
             <activation>
                 <property>
-                    <name>jbossas.eap6.zip</name>
+                    <name>jbossas.eap.zip</name>
                 </property>
             </activation>
             <modules>

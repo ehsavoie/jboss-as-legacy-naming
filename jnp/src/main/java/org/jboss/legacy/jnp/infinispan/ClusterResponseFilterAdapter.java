@@ -21,26 +21,25 @@
  */
 package org.jboss.legacy.jnp.infinispan;
 
-import org.jboss.as.clustering.ClusterNode;
-import org.jboss.as.clustering.ResponseFilter;
+import org.wildfly.clustering.group.Node;
 
 /**
  *
  * @author <a href="mailto:ehugonne@redhat.com">Emmanuel Hugonnet</a> (c) 2013 Red Hat, inc.
  */
-public class ClusterResponseFilterAdapter implements ResponseFilter {
+public class ClusterResponseFilterAdapter /*implements ResponseFilter*/ {
+    //TODO: XXX
     private final ClusterResponseFilter filter;
     
     public ClusterResponseFilterAdapter(ClusterResponseFilter filter) {
         this.filter = filter;
     }
 
-    @Override
-    public boolean isAcceptable(Object o, ClusterNode cn) {
-        return filter.isAcceptable(o, new ClusterNodeProxy(cn.getIpAddress(), cn.getName(), cn.getPort()));
+    public boolean isAcceptable(Object o, Node cn) {
+        //return filter.isAcceptable(o, new ClusterNodeProxy(cn.getIpAddress(), cn.getName(), cn.getPort()));
+        return false;
     }
 
-    @Override
     public boolean needMoreResponses() {
         return filter.needMoreResponses();
     }

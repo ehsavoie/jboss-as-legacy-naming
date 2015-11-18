@@ -98,17 +98,17 @@ It is possible to enable backward calls from EAP6 to EAP5. In order to do so:
 ##Simple build
 Run _build.sh_  
 ##Build and Test
-Download a zip archive of EAP 6.2.1 (at least).   
-Run _build.sh -Djbossas.eap6.zip=/path to archive/jboss-eap-6.2.1-full-build.zip_  
+Download a zip archive of EAP 7.x (at least).   
+Run _build.sh -Djbossas.eap.zip=/complicated_path/jboss-eap-7.0.0.Beta.zip  -Djbossas.eap.distro=jboss-eap-7.0  
 ##Build and deploy
-Download and install EAP 6.2.1 (at least). 
+Download and install EAP 7.x (at least). 
 Define the environment variable $JBOSS_HOME pointing towards your EAP6 installation.  
 Run _deploy.sh_   
-Define your configuration in the EAP6 server. 
+Define your configuration in the EAP7 server. 
 #Installation
 Download the zip or tar.gz archive of the extension.  
-Unarchive it in the EAP6 installation directory.  
-Define your configuration in the EAP6 server. 
+Unarchive it in the EAP7 installation directory.  
+Define your configuration in the EAP7 server. 
 #Uninstallation
 Remove the configuration entries from your JBoss configuration file.  
 Delete the folder _$JBOSS_HOME/modules/system/layers/base/org/jboss/legacy/_
