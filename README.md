@@ -5,11 +5,11 @@ jboss-as-legacy-naming
 
 The full documentation is at https://mojo.redhat.com/docs/DOC-950104
 
-EAP5 used a different naming and remote protocols than EAP6. 
-Thus when you want to interact with EAP6 from an EAP5 client (or server) you are confronted with a lot of issues.  
-One solution would be to upgrade your client to EAP6, but sometimes this is not as simple as it seems.  
-For these cases we have developed a set of extensions for seamless integration of legacy clients with EAP6 and above.  
-<!--This extension is there to facilitate the migration from EAP 5 to EAP6, as such it is supported only as long as EAP 5 support last.  
+EAP5 used a different naming and remote protocols than EAP7. 
+Thus when you want to interact with EAP7 from an EAP5 client (or server) you are confronted with a lot of issues.  
+One solution would be to upgrade your client to EAP7, but sometimes this is not as simple as it seems.  
+For these cases we have developed a set of extensions for seamless integration of legacy clients with EAP7 and above.  
+<!--This extension is there to facilitate the migration from EAP 5 to EAP7, as such it is supported only as long as EAP 5 support last.  
 _Being a migration tool there won't be any backport, only the latest greatest version (so no backports) is supported within the same lifecycle as EAP 5.3_.-->
 
 Another tool exists for adding support to remote EJB 3 invokation and use of UserTransaction with an EAP 5 client.  
@@ -20,9 +20,6 @@ This tool uses the curent extension but to avoid any compatibility issue **DO NO
  - *jnp-connector* : mandatory element
     - _socket-binding_ : mandatory, defines the port used for te JNP server.
     - _rmi-socket-binding_ : optionnal, defines the port used for RMI connection. If it is not defined it will default to *1099*.
- - *distributed-cache* : optionnal element
-    - _cache-container_ : name of the cache container to use.
-    - _cache-ref_ : name of the cache in the cache container to use.
 
 ##Minimal configuration example
 
@@ -52,20 +49,7 @@ This tool uses the curent extension but to avoid any compatibility issue **DO NO
     <subsystem xmlns="urn:jboss:domain:legacy-jnp:1.0">  
       <jnp-server/>  
       <jnp-connector socket-binding="jnp" rmi-socket-binding="rmi-jnp" />
-      <!-- Reference to the Infinispan cache that will be used -->
-      <distributed-cache cache-container="singleton" cache-ref="default" />  
     </subsystem>
-    ...
-    <!-- Default Infinispan configuration to show how it matches the distributed cache -->  
-    <subsystem xmlns="urn:jboss:domain:infinispan:1.4">  
-      <cache-container name="singleton" aliases="cluster ha-partition" default-cache="default">  
-        <transport lock-timeout="60000"/>  
-        <replicated-cache name="default" mode="SYNC" batching="true">  
-          <locking isolation="REPEATABLE_READ"/>  
-        </replicated-cache>  
-      </cache-container>  
-      ...  
-    </subsystem>  
     ...  
     <socket-binding-group>  
       ...  
@@ -76,8 +60,8 @@ This tool uses the curent extension but to avoid any compatibility issue **DO NO
 
 #Client calls
 
-It is possible to enable backward calls from EAP6 to EAP5. In order to do so:
-    1. EAP6 has to define external-context factory
+It is possible to enable backward calls from EAP7 to EAP5. In order to do so:
+    1. EAP7 has to define external-context factory
     2. This extension lib module must have all required dependencies linked
     
 ## External context configuration:
@@ -102,7 +86,7 @@ Download a zip archive of EAP 7.x (at least).
 Run _build.sh -Djbossas.eap.zip=/complicated_path/jboss-eap-7.0.0.Beta.zip  -Djbossas.eap.distro=jboss-eap-7.0  
 ##Build and deploy
 Download and install EAP 7.x (at least). 
-Define the environment variable $JBOSS_HOME pointing towards your EAP6 installation.  
+Define the environment variable $JBOSS_HOME pointing towards your EAP7 installation.  
 Run _deploy.sh_   
 Define your configuration in the EAP7 server. 
 #Installation

@@ -26,9 +26,11 @@ MA 02110-1301  USA
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
                 xmlns:jnp="urn:jboss:domain:legacy-jnp:1.0"
                 xmlns:domain="urn:jboss:domain:1.6"
-                exclude-result-prefixes="domain jnp">
+                xmlns:naming="urn:jboss:naming:2.0"
+                exclude-result-prefixes="domain jnp naming">
     
     <xsl:variable name="nsMessagingInf" select="'urn:jboss:domain:messaging:'"/>
+    <xsl:variable name="nsNamingInf" select="'urn:jboss:domain:naming:'"/>
     <xsl:variable name="nsDomainInf" select="'urn:jboss:domain:'"/>
 
     <xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes"/>
@@ -100,6 +102,28 @@ MA 02110-1301  USA
                 </socket-binding>
             </xsl:otherwise>
         </xsl:choose>
+    </xsl:template>
+
+
+	<xsl:template match="//*[local-name()='subsystem' and starts-with(namespace-uri(), $nsNamingInf)]">
+       <xsl:copy>
+            <xsl:apply-templates />
+            <xsl:choose>
+                <xsl:when test="//*[local-name()='subsystem']/*[local-name()='bindings']">
+                </xsl:when>
+                <xsl:otherwise>
+                    <bindings>
+	      		<external-context name="java:global/client-context" module="org.jboss.legacy.naming.spi" class="javax.naming.InitialContext">
+                	<environment>
+                    	<property name="java.naming.provider.url" value="jnp://localhost:5599"/>
+                    	<property name="java.naming.factory.url.pkgs" value="org.jnp.interfaces"/>
+                    	<property name="java.naming.factory.initial" value="org.jboss.legacy.jnp.factory.WatchfulContextFactory"/>
+                	</environment>
+            	</external-context>
+	  		</bindings>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:copy>
     </xsl:template>
 
 </xsl:stylesheet>

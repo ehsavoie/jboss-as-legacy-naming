@@ -283,6 +283,7 @@
                                                 <include name="**/standalone-full.xml" />
                                             </fileset>
                                         </xslt>
+                                        <!--
                                         <xslt destdir="target/runtime/jboss-eap/standalone/configuration" style="src/test/resources/xslt/enableHAJNP-backup.xsl" extension="-jnp-backup.xml.mod" useImplicitFileset="false">
                                             <fileset dir="target/runtime/jboss-eap/standalone/configuration">
                                                 <include name="**/standalone-full-ha.xml" />
@@ -293,11 +294,14 @@
                                                 <include name="**/standalone-full-ha.xml" />
                                             </fileset>
                                         </xslt>
+                                        -->
                                         <move todir="target/runtime/jboss-eap/standalone/configuration">
                                             <fileset dir="target/runtime/jboss-eap/standalone/configuration">
                                                 <include name="**/standalone-full-jnp.xml.mod" />
+                                                <!--
                                                 <include name="**/standalone-full-ha-jnp.xml.mod" />
                                                 <include name="**/standalone-full-ha-jnp-backup.xml.mod" />
+                                                -->
                                             </fileset>
                                             <mapper type="glob" from="*.mod" to="*" />
                                         </move>
