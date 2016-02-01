@@ -30,7 +30,7 @@
     </parent>
     <groupId>org.jboss.as.legacy</groupId>
     <artifactId>jboss-as-legacy-naming</artifactId>
-    <version>1.3.0-SNASPHOT</version>
+    <version>1.3.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>JBoss Application Server Legacy : Naming</name>
 
