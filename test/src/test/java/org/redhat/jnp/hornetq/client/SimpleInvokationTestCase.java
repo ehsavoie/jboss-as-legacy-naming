@@ -22,6 +22,7 @@
 package org.redhat.jnp.hornetq.client;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -44,7 +45,7 @@ import org.jboss.arquillian.container.test.api.Deployer;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
-import org.jboss.as.arquillian.container.ManagementClient;
+import org.jboss.as.controller.client.ModelControllerClient;
 import org.jboss.as.test.integration.common.jms.JMSOperations;
 import org.jboss.as.test.integration.common.jms.JMSOperationsProvider;
 import org.jboss.as.test.shared.TestSuiteEnvironment;
@@ -81,10 +82,9 @@ public class SimpleInvokationTestCase {
     @ArquillianResource
     private static ContainerController containerController;
 
-    private ManagementClient managementClient = new ManagementClient(TestSuiteEnvironment.getModelControllerClient(),
-            TestSuiteEnvironment.getServerAddress(), TestSuiteEnvironment.getServerPort(), "http-remoting");
+    private final ModelControllerClient client = getModelControllerClient();
 
-    private JMSOperations jmsAdminOperations = JMSOperationsProvider.getInstance(managementClient);
+    private JMSOperations jmsAdminOperations = JMSOperationsProvider.getInstance(client);
 
     @ArquillianResource
     private Deployer deployer;
@@ -205,5 +205,13 @@ public class SimpleInvokationTestCase {
         Properties jndiProperties = new Properties();
         jndiProperties.load(this.getClass().getClassLoader().getResourceAsStream(System.getProperty("jndi_config", JNDI_CONFIG)));
         return new javax.naming.InitialContext(jndiProperties);
+    }
+
+    private ModelControllerClient getModelControllerClient() {
+        try {
+            return ModelControllerClient.Factory.create("remote", TestSuiteEnvironment.getServerAddress(), 9999);
+        } catch (UnknownHostException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 }
