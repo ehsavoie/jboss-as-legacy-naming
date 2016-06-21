@@ -34,7 +34,7 @@ MA 02110-1301  USA
                 <property name="allowConnectingToRunningServer">true</property>
                 <property name="managementAddress">${node0:127.0.0.1}</property>
                 <property name="managementPort">${as.managementPort:9990}</property>
-                <property name="waitForPorts">${as.debug.port:8787} ${as.managementPort:9999}</property>
+                <property name="waitForPorts">${as.debug.port:8787} ${as.managementPort:9990}</property>
                 <property name="waitForPortsTimeoutInSeconds">8</property>
             </configuration>
         </container>    
@@ -57,7 +57,7 @@ MA 02110-1301  USA
                 <property name="serverConfig">standalone-full-ha-jnp-backup.xml</property>
                 <property name="allowConnectingToRunningServer">true</property>
                 <property name="managementAddress">${node2:127.0.0.1}</property>
-                <property name="managementPort">${as.managementPort:10499}</property>
+                <property name="managementPort">${as.managementPort:10490}</property>
                 <property name="waitForPorts">${as.managementPort:10490}</property>
                 <property name="waitForPortsTimeoutInSeconds">8</property>
             </configuration>
